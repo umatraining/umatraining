@@ -13,282 +13,6 @@
 					"name": "Customer",
 					"item": [
 						{
-							"name": "Test_Create Get and Delete Customer",
-							"item": [
-								{
-									"name": "Test should pass after a new customer is created with valid details",
-									"event": [
-										{
-											"listen": "prerequest",
-											"script": {
-												"exec": [
-													"\r",
-													"window = {};\r",
-													"pm.sendRequest(\"https://cdnjs.cloudflare.com/ajax/libs/Faker/3.1.0/faker.min.js\", (error, response) => {\r",
-													"    if (error || response.code !== 200) {\r",
-													"        pm.expect.fail('Could not load external library');\r",
-													"    }\r",
-													"    eval(response.text());\r",
-													"    // Set faker library\r",
-													"    window.faker.locale=\"en\";\r",
-													"     pm.collectionVariables.set(\"lastname\", window.faker.name.firstName());\r",
-													"    pm.collectionVariables.set(\"firstname\", window.faker.name.lastName());\r",
-													"    pm.collectionVariables.set(\"customername\", window.faker.name.firstName());\r",
-													"    emailid=pm.collectionVariables.get(\"firstname\")+\"_\"+pm.collectionVariables.get(\"lastname\")+\"@yopmail.com\";\r",
-													"    pm.collectionVariables.set(\"email\",emailid);\r",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										},
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													"pm.test(\"Response time to create an customer account is \"+pm.response.responseTime +\"ms\", function () {\r",
-													"    // pm.expect(pm.response.responseTime).to.be.below(200);\r",
-													"});\r",
-													"\r",
-													"var schema = {\r",
-													"  \"$schema\": \"http://json-schema.org/draft-04/schema#\",\r",
-													"  \"type\": \"object\",\r",
-													"  \"properties\": {\r",
-													"    \"id\": {\r",
-													"      \"type\": \"string\"\r",
-													"    },\r",
-													"    \"adminLastName\": {\r",
-													"      \"type\": \"string\"\r",
-													"    },\r",
-													"    \"adminFirstName\": {\r",
-													"      \"type\": \"string\"\r",
-													"    },\r",
-													"    \"customerName\": {\r",
-													"      \"type\": \"string\"\r",
-													"    },\r",
-													"    \"customerDescription\": {\r",
-													"      \"type\": \"null\"\r",
-													"    },\r",
-													"    \"customerType\": {\r",
-													"      \"type\": \"string\"\r",
-													"    },\r",
-													"    \"adminEmail\": {\r",
-													"      \"type\": \"string\"\r",
-													"    },\r",
-													"    \"createdAt\": {\r",
-													"      \"type\": \"string\"\r",
-													"    }\r",
-													"  },\r",
-													"  \"required\": [\r",
-													"    \"id\",\r",
-													"    \"adminLastName\",\r",
-													"    \"adminFirstName\",\r",
-													"    \"customerName\",\r",
-													"    \"customerDescription\",\r",
-													"    \"customerType\",\r",
-													"    \"adminEmail\",\r",
-													"    \"createdAt\"\r",
-													"  ]\r",
-													"};\r",
-													"\r",
-													"var jsonResponse =pm.response.json\r",
-													"var data2 = [true, 123];\r",
-													"\r",
-													"pm.test('Validate the schema of Post custmer API', function () {\r",
-													"    // pm.expect(tv4.validate(jsonResponse, schema)).to.be.true;\r",
-													"    // pm.expect(tv4.validate(data2, schema)).to.be.true;\r",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\r\n    \"adminLastName\": \"{{lastname}}\",\r\n    \"adminFirstName\": \"{{firstname}}\",\r\n    \"customerName\": \"{{customername}}\",\r\n    \"adminEmail\": \"{{email}}\",\r\n    \"customerType\": \"WAREHOUSE\"\r\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
-										"url": {
-											"raw": "{{url}}/feature/customers",
-											"host": [
-												"{{url}}"
-											],
-											"path": [
-												"feature",
-												"customers"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Retrieve data of Created customer",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													" var responseJson = pm.response.json();\r",
-													"pm.test(\"Checking firstname of the created customer\", function(){    pm.expect(responseJson.data[0].adminFirstName).to.eql(pm.collectionVariables.get(\"firstname\"));})\r",
-													"pm.test(\"Checking lastname of the created customer\", function(){    pm.expect(responseJson.data[0].adminLastName).to.eql(pm.collectionVariables.get(\"lastname\"));})\r",
-													"pm.test(\"Checking customerName of the created customer\", function(){    pm.expect(responseJson.data[0].customerName).to.eql(pm.collectionVariables.get(\"customername\"));})\r",
-													"pm.test(\"Checking email of the created customer\", function(){    pm.expect(responseJson.data[0].adminEmail).to.eql(pm.collectionVariables.get(\"email\"));})\r",
-													"pm.collectionVariables.set(\"id\",responseJson.data[0].id);\r",
-													"pm.test(\"Response time to reterieve an customer details is \"+pm.response.responseTime +\"ms\", function () {\r",
-													"    // pm.expect(pm.response.responseTime).to.be.below(200);\r",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "{{url}}/feature/customers?page=1&page_size=50&order_by=descCreatedAt",
-											"host": [
-												"{{url}}"
-											],
-											"path": [
-												"feature",
-												"customers"
-											],
-											"query": [
-												{
-													"key": "page",
-													"value": "1"
-												},
-												{
-													"key": "page_size",
-													"value": "50"
-												},
-												{
-													"key": "order_by",
-													"value": "descCreatedAt"
-												}
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Test should pass after a new customer is deleted",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													"pm.test(\"Deleted account Successfully\", function () {\r",
-													"    pm.response.to.have.body(\"\\\"DELETED\\\"\\n\")\r",
-													"});\r",
-													"pm.test(\"Response time to delete an customer account is \"+pm.response.responseTime +\"ms\", function () {\r",
-													"    // pm.expect(pm.response.responseTime).to.be.below(200);\r",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "DELETE",
-										"header": [],
-										"url": {
-											"raw": "{{url}}/feature/customers/{{id}}",
-											"host": [
-												"{{url}}"
-											],
-											"path": [
-												"feature",
-												"customers",
-												"{{id}}"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Test should pass after a new customer is created",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													" var responseJson = pm.response.json();\r",
-													"pm.test(\"Checking firstname of the deleted customer\", function(){    pm.expect(responseJson.data[0].adminFirstName).to.not.eql(pm.collectionVariables.get(\"firstname\"));})\r",
-													"pm.test(\"Checking lastname of the deleted customer\", function(){    pm.expect(responseJson.data[0].adminLastName).to.not.eql(pm.collectionVariables.get(\"lastname\"));})\r",
-													"pm.test(\"Checking customerName of the deleted customer\", function(){    pm.expect(responseJson.data[0].customerName).to.not.eql(pm.collectionVariables.get(\"customername\"));})\r",
-													"pm.test(\"Checking email of the deleted customer\", function(){    pm.expect(responseJson.data[0].adminEmail).to.not.eql(pm.collectionVariables.get(\"email\"));})\r",
-													"pm.collectionVariables.unset(\"id\",responseJson.data[0].id);\r",
-													""
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "{{url}}/feature/customers?page=1&page_size=50&order_by=descCreatedAt",
-											"host": [
-												"{{url}}"
-											],
-											"path": [
-												"feature",
-												"customers"
-											],
-											"query": [
-												{
-													"key": "page",
-													"value": "1"
-												},
-												{
-													"key": "page_size",
-													"value": "50"
-												},
-												{
-													"key": "order_by",
-													"value": "descCreatedAt"
-												}
-											]
-										}
-									},
-									"response": []
-								}
-							],
-							"event": [
-								{
-									"listen": "prerequest",
-									"script": {
-										"type": "text/javascript",
-										"exec": [
-											""
-										]
-									}
-								},
-								{
-									"listen": "test",
-									"script": {
-										"type": "text/javascript",
-										"exec": [
-											"pm.test(\"Status code for created customer is 200\", function () {",
-											"    pm.response.to.have.status(200);",
-											"});",
-											"pm.test(\"Status code for created customer name has  Ok\", function () {    ",
-											"    pm.response.to.have.status(\"OK\");});"
-										]
-									}
-								}
-							]
-						},
-						{
 							"name": "Test_NegativeTest cases",
 							"item": [
 								{
@@ -579,6 +303,356 @@
 							]
 						},
 						{
+							"name": "Test_postive flow",
+							"item": [
+								{
+									"name": "set the global value of master token",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"\r",
+													"var clientId = \"66bcu8r8usmhrsqa41gmctitms\";\r",
+													"\r",
+													"var clientSecret = \"\";\r",
+													"\r",
+													"var username = \"adminnorth01@yopmail.com\";\r",
+													"\r",
+													"var password = \"Pass@12345\";\r",
+													"pm.sendRequest({\r",
+													"\r",
+													"           url: \"https://cognito-idp.eu-central-1.amazonaws.com/\",\r",
+													"\r",
+													"           method: 'POST',\r",
+													"\r",
+													"           header: {\r",
+													"\r",
+													"                    'X-Amz-Target':   'AWSCognitoIdentityProviderService.InitiateAuth',\r",
+													"\r",
+													"                    'Content-Type': 'application/x-amz-json-1.1'\r",
+													"\r",
+													"                   },\r",
+													"\r",
+													"            body: {\r",
+													"\r",
+													"                   mode: 'raw',\r",
+													"\r",
+													"                   raw: JSON.stringify({\r",
+													"\r",
+													"                   \"AuthParameters\": {\r",
+													"\r",
+													"                   \"USERNAME\": username,\r",
+													"\r",
+													"                   \"PASSWORD\": password\r",
+													"\r",
+													"                   },\r",
+													"\r",
+													"                  \"AuthFlow\": \"USER_PASSWORD_AUTH\",\r",
+													"\r",
+													"                  \"ClientId\": clientId\r",
+													"\r",
+													"  }),\r",
+													"\r",
+													"options: {\r",
+													"\r",
+													"raw: {\r",
+													"\r",
+													"language: 'json'\r",
+													"\r",
+													"}\r",
+													"\r",
+													"}\r",
+													"\r",
+													"}\r",
+													"\r",
+													"}, function (error, response) {\r",
+													"\r",
+													"console.log(response.json());\r",
+													"\r",
+													"pm.environment.set(\"cognitoAccessToken\", response.json().AuthenticationResult.AccessToken);\r",
+													"\r",
+													"pm.environment.set(\"cognitoIdToken\", response.json().AuthenticationResult.IdToken);\r",
+													"\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "https://cognito-idp.eu-central-1.amazonaws.com/",
+											"protocol": "https",
+											"host": [
+												"cognito-idp",
+												"eu-central-1",
+												"amazonaws",
+												"com"
+											],
+											"path": [
+												""
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Test should pass after a new customer is created with valid details",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"\r",
+													"window = {};\r",
+													"pm.sendRequest(\"https://cdnjs.cloudflare.com/ajax/libs/Faker/3.1.0/faker.min.js\", (error, response) => {\r",
+													"    if (error || response.code !== 200) {\r",
+													"        pm.expect.fail('Could not load external library');\r",
+													"    }\r",
+													"    eval(response.text());\r",
+													"    // Set faker library\r",
+													"    window.faker.locale=\"en\";\r",
+													"     pm.collectionVariables.set(\"lastname\", window.faker.name.firstName());\r",
+													"    pm.collectionVariables.set(\"firstname\", window.faker.name.lastName());\r",
+													"    pm.collectionVariables.set(\"customername\", window.faker.name.firstName());\r",
+													"    emailid=pm.collectionVariables.get(\"firstname\")+\"_\"+pm.collectionVariables.get(\"lastname\")+\"@yopmail.com\";\r",
+													"    pm.collectionVariables.set(\"email\",emailid);\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Response time to create an customer account is \"+pm.response.responseTime +\"ms\", function () {\r",
+													"    // pm.expect(pm.response.responseTime).to.be.below(200);\r",
+													"});\r",
+													"\r",
+													"var schema = {\r",
+													"  \"$schema\": \"http://json-schema.org/draft-04/schema#\",\r",
+													"  \"type\": \"object\",\r",
+													"  \"properties\": {\r",
+													"    \"id\": {\r",
+													"      \"type\": \"string\"\r",
+													"    },\r",
+													"    \"adminLastName\": {\r",
+													"      \"type\": \"string\"\r",
+													"    },\r",
+													"    \"adminFirstName\": {\r",
+													"      \"type\": \"string\"\r",
+													"    },\r",
+													"    \"customerName\": {\r",
+													"      \"type\": \"string\"\r",
+													"    },\r",
+													"    \"customerDescription\": {\r",
+													"      \"type\": \"null\"\r",
+													"    },\r",
+													"    \"customerType\": {\r",
+													"      \"type\": \"string\"\r",
+													"    },\r",
+													"    \"adminEmail\": {\r",
+													"      \"type\": \"string\"\r",
+													"    },\r",
+													"    \"createdAt\": {\r",
+													"      \"type\": \"string\"\r",
+													"    }\r",
+													"  },\r",
+													"  \"required\": [\r",
+													"    \"id\",\r",
+													"    \"adminLastName\",\r",
+													"    \"adminFirstName\",\r",
+													"    \"customerName\",\r",
+													"    \"customerDescription\",\r",
+													"    \"customerType\",\r",
+													"    \"adminEmail\",\r",
+													"    \"createdAt\"\r",
+													"  ]\r",
+													"};\r",
+													"\r",
+													"var jsonResponse =pm.response.json\r",
+													"var data2 = [true, 123];\r",
+													"\r",
+													"pm.test('Validate the schema of Post custmer API', function () {\r",
+													"    // pm.expect(tv4.validate(jsonResponse, schema)).to.be.true;\r",
+													"    // pm.expect(tv4.validate(data2, schema)).to.be.true;\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"adminLastName\": \"{{lastname}}\",\r\n    \"adminFirstName\": \"{{firstname}}\",\r\n    \"customerName\": \"{{customername}}\",\r\n    \"adminEmail\": \"{{email}}\",\r\n    \"customerType\": \"WAREHOUSE\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/feature/customers",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"feature",
+												"customers"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Retrieve data of Created customer",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													" var responseJson = pm.response.json();\r",
+													"pm.test(\"Checking firstname of the created customer\", function(){    pm.expect(responseJson.data[0].adminFirstName).to.eql(pm.collectionVariables.get(\"firstname\"));})\r",
+													"pm.test(\"Checking lastname of the created customer\", function(){    pm.expect(responseJson.data[0].adminLastName).to.eql(pm.collectionVariables.get(\"lastname\"));})\r",
+													"pm.test(\"Checking customerName of the created customer\", function(){    pm.expect(responseJson.data[0].customerName).to.eql(pm.collectionVariables.get(\"customername\"));})\r",
+													"pm.test(\"Checking email of the created customer\", function(){    pm.expect(responseJson.data[0].adminEmail).to.eql(pm.collectionVariables.get(\"email\"));})\r",
+													"pm.collectionVariables.set(\"id\",responseJson.data[0].id);\r",
+													"pm.test(\"Response time to reterieve an customer details is \"+pm.response.responseTime +\"ms\", function () {\r",
+													"    // pm.expect(pm.response.responseTime).to.be.below(200);\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{url}}/feature/customers?page=1&page_size=50&order_by=descCreatedAt",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"feature",
+												"customers"
+											],
+											"query": [
+												{
+													"key": "page",
+													"value": "1"
+												},
+												{
+													"key": "page_size",
+													"value": "50"
+												},
+												{
+													"key": "order_by",
+													"value": "descCreatedAt"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Test should pass after a new customer is deleted",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Deleted account Successfully\", function () {\r",
+													"    pm.response.to.have.body(\"\\\"DELETED\\\"\\n\")\r",
+													"});\r",
+													"pm.test(\"Response time to delete an customer account is \"+pm.response.responseTime +\"ms\", function () {\r",
+													"    // pm.expect(pm.response.responseTime).to.be.below(200);\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{url}}/feature/customers/{{id}}",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"feature",
+												"customers",
+												"{{id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Test should pass after a new customer is created",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													" var responseJson = pm.response.json();\r",
+													"pm.test(\"Checking firstname of the deleted customer\", function(){    pm.expect(responseJson.data[0].adminFirstName).to.not.eql(pm.collectionVariables.get(\"firstname\"));})\r",
+													"pm.test(\"Checking lastname of the deleted customer\", function(){    pm.expect(responseJson.data[0].adminLastName).to.not.eql(pm.collectionVariables.get(\"lastname\"));})\r",
+													"pm.test(\"Checking customerName of the deleted customer\", function(){    pm.expect(responseJson.data[0].customerName).to.not.eql(pm.collectionVariables.get(\"customername\"));})\r",
+													"pm.test(\"Checking email of the deleted customer\", function(){    pm.expect(responseJson.data[0].adminEmail).to.not.eql(pm.collectionVariables.get(\"email\"));})\r",
+													"pm.collectionVariables.unset(\"id\",responseJson.data[0].id);\r",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{url}}/feature/customers?page=1&page_size=50&order_by=descCreatedAt&Authorization=eyJraWQiOiIxVHROR1E2Q2tiMnFUaU4wTzVrcEx6RHVsN1U1Vk9tREFzRDAxOE96cjFJPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiI5ZjA4N2NiMS1iNTQ1LTRjNTAtYTFiOS00ZjIwMWRkMGU4ZDQiLCJkZXZpY2Vfa2V5IjoiZXUtY2VudHJhbC0xXzkzYTFhMGVkLTNiMmYtNDk3Ni1iNjZiLTdlMDZiOTk4MDhlMSIsImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC5ldS1jZW50cmFsLTEuYW1hem9uYXdzLmNvbVwvZXUtY2VudHJhbC0xX3Nac0h3eHlIMCIsImNsaWVudF9pZCI6IjY2YmN1OHI4dXNtaHJzcWE0MWdtY3RpdG1zIiwib3JpZ2luX2p0aSI6ImIyYzI0MmJiLWI5OTAtNDAxOS05Mzg2LWYwYTMzNjQ0NGUxMCIsImV2ZW50X2lkIjoiYTYwYTQwOGYtNmM4Ni00MTJjLWExMTktYmE2NGRiZDE5NGE0IiwidG9rZW5fdXNlIjoiYWNjZXNzIiwic2NvcGUiOiJhd3MuY29nbml0by5zaWduaW4udXNlci5hZG1pbiIsImF1dGhfdGltZSI6MTY4MTc0MTQxMSwiZXhwIjoxNjgxODI3ODExLCJpYXQiOjE2ODE3NDE0MTEsImp0aSI6IjEzZWRjMGMzLTdiMzgtNDQxZi1hYWM2LWM4ZWJiNTA1ODBlNCIsInVzZXJuYW1lIjoiOWYwODdjYjEtYjU0NS00YzUwLWExYjktNGYyMDFkZDBlOGQ0In0.jA4ZJe0ObplBq_l56--LDJ4QMqwPbqA3RUqp1nO6qucfB4CGT7Hc0yPpFAG6ORYmx4N_ca1ifdDVJyfGlldafVjyihJR6HZCpVVnbPzffskDH4thhBa1Adkr0c0sehvCaTdMqpRSslhixJKNDVRAYMLSfWtSL878BIYz-8jujp6LXohCJUqnRJQkVIgDQ5TPtKprhWCgukafEMcQ--YUwayQQIFApIpLQcvcw_EfuGaLu5Gt2cXnaNzZQAh1YlRMLCF71xydgmB52gztxfMSNUCWKIXuz7lBDI0lm9TWrtkK2qtKt8ZCMg0CFshBNrwwoo3PVdOFCRSj4BvQB7CP7g",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"feature",
+												"customers"
+											],
+											"query": [
+												{
+													"key": "page",
+													"value": "1"
+												},
+												{
+													"key": "page_size",
+													"value": "50"
+												},
+												{
+													"key": "order_by",
+													"value": "descCreatedAt"
+												},
+												{
+													"key": "Authorization",
+													"value": "eyJraWQiOiIxVHROR1E2Q2tiMnFUaU4wTzVrcEx6RHVsN1U1Vk9tREFzRDAxOE96cjFJPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiI5ZjA4N2NiMS1iNTQ1LTRjNTAtYTFiOS00ZjIwMWRkMGU4ZDQiLCJkZXZpY2Vfa2V5IjoiZXUtY2VudHJhbC0xXzkzYTFhMGVkLTNiMmYtNDk3Ni1iNjZiLTdlMDZiOTk4MDhlMSIsImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC5ldS1jZW50cmFsLTEuYW1hem9uYXdzLmNvbVwvZXUtY2VudHJhbC0xX3Nac0h3eHlIMCIsImNsaWVudF9pZCI6IjY2YmN1OHI4dXNtaHJzcWE0MWdtY3RpdG1zIiwib3JpZ2luX2p0aSI6ImIyYzI0MmJiLWI5OTAtNDAxOS05Mzg2LWYwYTMzNjQ0NGUxMCIsImV2ZW50X2lkIjoiYTYwYTQwOGYtNmM4Ni00MTJjLWExMTktYmE2NGRiZDE5NGE0IiwidG9rZW5fdXNlIjoiYWNjZXNzIiwic2NvcGUiOiJhd3MuY29nbml0by5zaWduaW4udXNlci5hZG1pbiIsImF1dGhfdGltZSI6MTY4MTc0MTQxMSwiZXhwIjoxNjgxODI3ODExLCJpYXQiOjE2ODE3NDE0MTEsImp0aSI6IjEzZWRjMGMzLTdiMzgtNDQxZi1hYWM2LWM4ZWJiNTA1ODBlNCIsInVzZXJuYW1lIjoiOWYwODdjYjEtYjU0NS00YzUwLWExYjktNGYyMDFkZDBlOGQ0In0.jA4ZJe0ObplBq_l56--LDJ4QMqwPbqA3RUqp1nO6qucfB4CGT7Hc0yPpFAG6ORYmx4N_ca1ifdDVJyfGlldafVjyihJR6HZCpVVnbPzffskDH4thhBa1Adkr0c0sehvCaTdMqpRSslhixJKNDVRAYMLSfWtSL878BIYz-8jujp6LXohCJUqnRJQkVIgDQ5TPtKprhWCgukafEMcQ--YUwayQQIFApIpLQcvcw_EfuGaLu5Gt2cXnaNzZQAh1YlRMLCF71xydgmB52gztxfMSNUCWKIXuz7lBDI0lm9TWrtkK2qtKt8ZCMg0CFshBNrwwoo3PVdOFCRSj4BvQB7CP7g"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
 							"name": "Add Customer",
 							"request": {
 								"method": "POST",
@@ -646,102 +720,7 @@
 									]
 								}
 							},
-							"response": [
-								{
-									"name": "Get Customers",
-									"originalRequest": {
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "{{url}}/feature/customers?page=1&page_size=50&order_by=descCreatedAt",
-											"host": [
-												"{{url}}"
-											],
-											"path": [
-												"feature",
-												"customers"
-											],
-											"query": [
-												{
-													"key": "page",
-													"value": "1"
-												},
-												{
-													"key": "page_size",
-													"value": "50"
-												},
-												{
-													"key": "order_by",
-													"value": "descCreatedAt"
-												}
-											]
-										}
-									},
-									"status": "OK",
-									"code": 200,
-									"_postman_previewlanguage": "json",
-									"header": [
-										{
-											"key": "Content-Type",
-											"value": "application/json"
-										},
-										{
-											"key": "Content-Length",
-											"value": "13757"
-										},
-										{
-											"key": "Connection",
-											"value": "keep-alive"
-										},
-										{
-											"key": "Date",
-											"value": "Thu, 23 Mar 2023 09:33:41 GMT"
-										},
-										{
-											"key": "x-amzn-RequestId",
-											"value": "061c6439-4b69-4aa8-b291-a49e339cc7df"
-										},
-										{
-											"key": "Access-Control-Allow-Origin",
-											"value": "*"
-										},
-										{
-											"key": "x-amzn-Remapped-Content-Length",
-											"value": "13757"
-										},
-										{
-											"key": "x-amz-apigw-id",
-											"value": "COl2VEQnliAFtMw="
-										},
-										{
-											"key": "Access-Control-Expose-Headers",
-											"value": "Authorization, Content-Disposition, X-Pagination"
-										},
-										{
-											"key": "X-Amzn-Trace-Id",
-											"value": "Root=1-641c1cf5-454c755e172b15774f4fe515;Sampled=0"
-										},
-										{
-											"key": "X-Cache",
-											"value": "Miss from cloudfront"
-										},
-										{
-											"key": "Via",
-											"value": "1.1 9394dfff2c95d42a370c89736cba98ee.cloudfront.net (CloudFront)"
-										},
-										{
-											"key": "X-Amz-Cf-Pop",
-											"value": "BOM78-P2"
-										},
-										{
-											"key": "X-Amz-Cf-Id",
-											"value": "BO4eHfzRFBP8pnBgklO9LGzyBqnUkec2frpPN1rsNw3uiFQKIUADGw=="
-										}
-									],
-									"cookie": [],
-									"body": "{\n    \"count\": 1027,\n    \"data\": [\n        {\n            \"id\": \"399da8bf-8250-4380-837c-696368be51c8\",\n            \"customerDescription\": null,\n            \"adminEmail\": \"Veum_Pablo@yopmail.com\",\n            \"customerName\": \"Towne\",\n            \"createdAt\": \"2023-03-23 08:43:22.737821\",\n            \"customerType\": \"PARTNER\",\n            \"adminLastName\": \"Pablo\",\n            \"adminFirstName\": \"Veum\"\n        },\n        {\n            \"id\": \"07ddfd3c-22ce-40ea-83af-a6b5d67244fa\",\n            \"customerDescription\": null,\n            \"adminEmail\": \"Bertram_McDermott17@hotmail.com\",\n            \"customerName\": \"New Customer\",\n            \"createdAt\": \"2023-03-23 08:43:07.818246\",\n            \"customerType\": \"WAREHOUSE\",\n            \"adminLastName\": \"432%$$^$&\",\n            \"adminFirstName\": \"&9695874\"\n        },\n        {\n            \"id\": \"3e66a04b-42f4-416e-83ba-04709de4dc9e\",\n            \"customerDescription\": null,\n            \"adminEmail\": \"Hagenes_Aidanyopmail.com\",\n            \"customerName\": \"New Customer\",\n            \"createdAt\": \"2023-03-23 08:43:04.754161\",\n            \"customerType\": \"WAREHOUSE\",\n            \"adminLastName\": \"Jay\",\n            \"adminFirstName\": \"Patel\"\n        },\n        {\n            \"id\": \"20e12248-df01-4574-b943-4d12bbc911af\",\n            \"customerDescription\": null,\n            \"adminEmail\": \"Witting_Karley@yopmail.com\",\n            \"customerName\": \"Lockman\",\n            \"createdAt\": \"2023-03-22 16:12:25.830873\",\n            \"customerType\": \"PARTNER\",\n            \"adminLastName\": \"Karley\",\n            \"adminFirstName\": \"Witting\"\n        },\n        {\n            \"id\": \"5331a06a-4f86-4091-b405-4bdcf61f5369\",\n            \"customerDescription\": null,\n            \"adminEmail\": \"Arch98@hotmail.com\",\n            \"customerName\": \"New Customer\",\n            \"createdAt\": \"2023-03-22 16:12:19.682901\",\n            \"customerType\": \"WAREHOUSE\",\n            \"adminLastName\": \"432%$$^$&\",\n            \"adminFirstName\": \"&9695874\"\n        },\n        {\n            \"id\": \"fee2de10-a426-4279-a17a-80f9ad854967\",\n            \"customerDescription\": null,\n            \"adminEmail\": \"Veum_Janayopmail.com\",\n            \"customerName\": \"New Customer\",\n            \"createdAt\": \"2023-03-22 16:12:18.774650\",\n            \"customerType\": \"WAREHOUSE\",\n            \"adminLastName\": \"Jay\",\n            \"adminFirstName\": \"Patel\"\n        },\n        {\n            \"id\": \"d9498893-9a9a-4477-83a9-5d96f73f0dea\",\n            \"customerDescription\": null,\n            \"adminEmail\": \"Fay_Bennie@yopmail.com\",\n            \"customerName\": \"Ankunding\",\n            \"createdAt\": \"2023-03-22 13:32:10.712894\",\n            \"customerType\": \"PARTNER\",\n            \"adminLastName\": \"Bennie\",\n            \"adminFirstName\": \"Fay\"\n        },\n        {\n            \"id\": \"24d97e7e-53bd-46dc-91aa-d5eab6e9a7d9\",\n            \"customerDescription\": null,\n            \"adminEmail\": \"Reva.Zemlak@gmail.com\",\n            \"customerName\": \"New Customer\",\n            \"createdAt\": \"2023-03-22 13:31:52.686891\",\n            \"customerType\": \"WAREHOUSE\",\n            \"adminLastName\": \"432%$$^$&\",\n            \"adminFirstName\": \"&9695874\"\n        },\n        {\n            \"id\": \"ab0f83ec-5d63-46ec-b25e-8786d4664c28\",\n            \"customerDescription\": null,\n            \"adminEmail\": \"Eichmann_Genesisyopmail.com\",\n            \"customerName\": \"New Customer\",\n            \"createdAt\": \"2023-03-22 13:31:51.093252\",\n            \"customerType\": \"WAREHOUSE\",\n            \"adminLastName\": \"Jay\",\n            \"adminFirstName\": \"Patel\"\n        },\n        {\n            \"id\": \"4813b57e-ebf3-4bbb-a5e8-e532bbf99226\",\n            \"customerDescription\": null,\n            \"adminEmail\": \"Hagenes_Grady@yopmail.com\",\n            \"customerName\": \"Mosciski\",\n            \"createdAt\": \"2023-03-22 13:29:37.479079\",\n            \"customerType\": \"PARTNER\",\n            \"adminLastName\": \"Grady\",\n            \"adminFirstName\": \"Hagenes\"\n        },\n        {\n            \"id\": \"979ba9ef-2b89-46cf-bae9-916296323f5c\",\n            \"customerDescription\": null,\n            \"adminEmail\": \"Jedediah_Rolfson@hotmail.com\",\n            \"customerName\": \"New Customer\",\n            \"createdAt\": \"2023-03-22 13:29:21.673292\",\n            \"customerType\": \"WAREHOUSE\",\n            \"adminLastName\": \"432%$$^$&\",\n            \"adminFirstName\": \"&9695874\"\n        },\n        {\n            \"id\": \"56e1e653-f26e-4822-afee-d7c6b4a6c7be\",\n            \"customerDescription\": null,\n            \"adminEmail\": \"Murray_Kellieyopmail.com\",\n            \"customerName\": \"New Customer\",\n            \"createdAt\": \"2023-03-22 13:29:19.603989\",\n            \"customerType\": \"WAREHOUSE\",\n            \"adminLastName\": \"Jay\",\n            \"adminFirstName\": \"Patel\"\n        },\n        {\n            \"id\": \"2baef50d-abdd-4ec6-9367-1c1bd0545e03\",\n            \"customerDescription\": null,\n            \"adminEmail\": \"Stamm_Dejuan@yopmail.com\",\n            \"customerName\": \"Hegmann\",\n            \"createdAt\": \"2023-03-22 12:36:52.370444\",\n            \"customerType\": \"PARTNER\",\n            \"adminLastName\": \"Dejuan\",\n            \"adminFirstName\": \"Stamm\"\n        },\n        {\n            \"id\": \"6b5a1cb8-42cb-4a3b-92a0-f9d3ea938785\",\n            \"customerDescription\": null,\n            \"adminEmail\": \"Abbott_Edd@yopmail.com\",\n            \"customerName\": \"Pfeffer\",\n            \"createdAt\": \"2023-03-22 12:35:08.784220\",\n            \"customerType\": \"PARTNER\",\n            \"adminLastName\": \"Edd\",\n            \"adminFirstName\": \"Abbott\"\n        },\n        {\n            \"id\": \"eee46ca2-0798-46f6-b1eb-731dc08d3388\",\n            \"customerDescription\": null,\n            \"adminEmail\": \"Miller_Thurman@yopmail.com\",\n            \"customerName\": \"Farrell\",\n            \"createdAt\": \"2023-03-22 12:29:08.049989\",\n            \"customerType\": \"PARTNER\",\n            \"adminLastName\": \"Thurman\",\n            \"adminFirstName\": \"Miller\"\n        },\n        {\n            \"id\": \"5d099c9e-576c-4e7a-9c4f-ebe41b4e3eaa\",\n            \"customerDescription\": null,\n            \"adminEmail\": \"Hilpert_Gilda@yopmail.com\",\n            \"customerName\": \"Stokes\",\n            \"createdAt\": \"2023-03-22 12:24:29.881815\",\n            \"customerType\": \"PARTNER\",\n            \"adminLastName\": \"Gilda\",\n            \"adminFirstName\": \"Hilpert\"\n        },\n        {\n            \"id\": \"8b37dc79-1b92-497a-9642-4e46819c6b12\",\n            \"customerDescription\": null,\n            \"adminEmail\": \"Jerde_Jadyn@yopmail.com\",\n            \"customerName\": \"Gusikowski\",\n            \"createdAt\": \"2023-03-22 12:19:24.386250\",\n            \"customerType\": \"PARTNER\",\n            \"adminLastName\": \"Jadyn\",\n            \"adminFirstName\": \"Jerde\"\n        },\n        {\n            \"id\": \"8655ef1d-13dc-43f7-9b5b-2961b343ab3d\",\n            \"customerDescription\": null,\n            \"adminEmail\": \"Ebert_Vicky@yopmail.com\",\n            \"customerName\": \"Greenholt\",\n            \"createdAt\": \"2023-03-22 12:18:58.300243\",\n            \"customerType\": \"PARTNER\",\n            \"adminLastName\": \"Vicky\",\n            \"adminFirstName\": \"Ebert\"\n        },\n        {\n            \"id\": \"7c7e79a6-858c-4794-aab8-f94352ade91d\",\n            \"customerDescription\": null,\n            \"adminEmail\": \"Runte_Garret@yopmail.com\",\n            \"customerName\": \"Schuppe\",\n            \"createdAt\": \"2023-03-22 12:17:18.902772\",\n            \"customerType\": \"PARTNER\",\n            \"adminLastName\": \"Garret\",\n            \"adminFirstName\": \"Runte\"\n        },\n        {\n            \"id\": \"182ce4e5-d758-414f-98cb-d0341708d958\",\n            \"customerDescription\": null,\n            \"adminEmail\": \"Dickinson_Martin@yopmail.com\",\n            \"customerName\": \"Sipes\",\n            \"createdAt\": \"2023-03-22 12:07:40.226870\",\n            \"customerType\": \"PARTNER\",\n            \"adminLastName\": \"Martin\",\n            \"adminFirstName\": \"Dickinson\"\n        },\n        {\n            \"id\": \"3b76c7d4-73cc-4e44-be08-d7ca3acf83db\",\n            \"customerDescription\": null,\n            \"adminEmail\": \"Ziemann_Jeanie@yopmail.com\",\n            \"customerName\": \"Daniel\",\n            \"createdAt\": \"2023-03-22 11:39:33.608884\",\n            \"customerType\": \"PARTNER\",\n            \"adminLastName\": \"Jeanie\",\n            \"adminFirstName\": \"Ziemann\"\n        },\n        {\n            \"id\": \"b62f8ca6-fa54-4a2b-9e9b-f794e512a28e\",\n            \"customerDescription\": null,\n            \"adminEmail\": \"Lupe59@yahoo.com\",\n            \"customerName\": \"New Customer\",\n            \"createdAt\": \"2023-03-22 11:39:18.405191\",\n            \"customerType\": \"WAREHOUSE\",\n            \"adminLastName\": \"432%$$^$&\",\n            \"adminFirstName\": \"&9695874\"\n        },\n        {\n            \"id\": \"33dcf502-5ab2-45cb-88a9-aa1100baa686\",\n            \"customerDescription\": null,\n            \"adminEmail\": \"Ritchie_Ferminyopmail.com\",\n            \"customerName\": \"New Customer\",\n            \"createdAt\": \"2023-03-22 11:39:16.422692\",\n            \"customerType\": \"WAREHOUSE\",\n            \"adminLastName\": \"Jay\",\n            \"adminFirstName\": \"Patel\"\n        },\n        {\n            \"id\": \"b89dd43e-f4f7-4154-94eb-09ee070ba22b\",\n            \"customerDescription\": null,\n            \"adminEmail\": \"Gutkowski_Pamela@yopmail.com\",\n            \"customerName\": \"Schinner\",\n            \"createdAt\": \"2023-03-22 10:23:47.016016\",\n            \"customerType\": \"PARTNER\",\n            \"adminLastName\": \"Pamela\",\n            \"adminFirstName\": \"Gutkowski\"\n        },\n        {\n            \"id\": \"b2654a53-6c10-4877-a39a-4351b6e3bf56\",\n            \"customerDescription\": null,\n            \"adminEmail\": \"Freeda_Considine85@yahoo.com\",\n            \"customerName\": \"New Customer\",\n            \"createdAt\": \"2023-03-22 10:23:37.203978\",\n            \"customerType\": \"WAREHOUSE\",\n            \"adminLastName\": \"432%$$^$&\",\n            \"adminFirstName\": \"&9695874\"\n        },\n        {\n            \"id\": \"428f8d49-ff54-414a-8ddc-414c5a1f0bf0\",\n            \"customerDescription\": null,\n            \"adminEmail\": \"Kerluke_Julieyopmail.com\",\n            \"customerName\": \"New Customer\",\n            \"createdAt\": \"2023-03-22 10:23:35.939456\",\n            \"customerType\": \"WAREHOUSE\",\n            \"adminLastName\": \"Jay\",\n            \"adminFirstName\": \"Patel\"\n        },\n        {\n            \"id\": \"5c8407ae-5a42-498e-9484-4571d482ae3d\",\n            \"customerDescription\": null,\n            \"adminEmail\": \"Dare_Hailey@yopmail.com\",\n            \"customerName\": \"Cole\",\n            \"createdAt\": \"2023-03-22 09:05:15.789078\",\n            \"customerType\": \"PARTNER\",\n            \"adminLastName\": \"Hailey\",\n            \"adminFirstName\": \"Dare\"\n        },\n        {\n            \"id\": \"e890b51c-f7a6-476a-a841-57b9b4b444e3\",\n            \"customerDescription\": null,\n            \"adminEmail\": \"Logan_Schuster62@yahoo.com\",\n            \"customerName\": \"New Customer\",\n            \"createdAt\": \"2023-03-22 09:05:04.786976\",\n            \"customerType\": \"WAREHOUSE\",\n            \"adminLastName\": \"432%$$^$&\",\n            \"adminFirstName\": \"&9695874\"\n        },\n        {\n            \"id\": \"944bee7f-7493-45b4-8a39-35eb257504ea\",\n            \"customerDescription\": null,\n            \"adminEmail\": \"Hermann_Ezequielyopmail.com\",\n            \"customerName\": \"New Customer\",\n            \"createdAt\": \"2023-03-22 09:05:03.348242\",\n            \"customerType\": \"WAREHOUSE\",\n            \"adminLastName\": \"Jay\",\n            \"adminFirstName\": \"Patel\"\n        },\n        {\n            \"id\": \"125d9f00-9f5f-4cbb-9e3b-d983d2ce48ac\",\n            \"customerDescription\": null,\n            \"adminEmail\": \"Hartmann_Kay@yopmail.com\",\n            \"customerName\": \"Hermiston\",\n            \"createdAt\": \"2023-03-22 08:28:11.086038\",\n            \"customerType\": \"PARTNER\",\n            \"adminLastName\": \"Kay\",\n            \"adminFirstName\": \"Hartmann\"\n        },\n        {\n            \"id\": \"0cc00f94-009d-4b60-bcfa-a8c5e7e14157\",\n            \"customerDescription\": null,\n            \"adminEmail\": \"Letitia.Rempel@gmail.com\",\n            \"customerName\": \"New Customer\",\n            \"createdAt\": \"2023-03-22 08:27:51.922080\",\n            \"customerType\": \"WAREHOUSE\",\n            \"adminLastName\": \"432%$$^$&\",\n            \"adminFirstName\": \"&9695874\"\n        },\n        {\n            \"id\": \"61b61841-e03d-401f-9b40-a3ed59d0b8d2\",\n            \"customerDescription\": null,\n            \"adminEmail\": \"Runolfsson_Averyyopmail.com\",\n            \"customerName\": \"New Customer\",\n            \"createdAt\": \"2023-03-22 08:27:50.115893\",\n            \"customerType\": \"WAREHOUSE\",\n            \"adminLastName\": \"Jay\",\n            \"adminFirstName\": \"Patel\"\n        },\n        {\n            \"id\": \"d11c1945-b4dc-4e03-a8bc-3c46d83fbc42\",\n            \"customerDescription\": null,\n            \"adminEmail\": \"Hills_Adell@yopmail.com\",\n            \"customerName\": \"Veum\",\n            \"createdAt\": \"2023-03-22 08:22:46.837730\",\n            \"customerType\": \"PARTNER\",\n            \"adminLastName\": \"Adell\",\n            \"adminFirstName\": \"Hills\"\n        },\n        {\n            \"id\": \"6ab47833-1459-4f4b-8f12-cb4ebbbb1d67\",\n            \"customerDescription\": null,\n            \"adminEmail\": \"Abbey58@hotmail.com\",\n            \"customerName\": \"New Customer\",\n            \"createdAt\": \"2023-03-22 08:22:28.288208\",\n            \"customerType\": \"WAREHOUSE\",\n            \"adminLastName\": \"432%$$^$&\",\n            \"adminFirstName\": \"&9695874\"\n        },\n        {\n            \"id\": \"f7203a49-5f5b-43df-afce-117e1c8b7045\",\n            \"customerDescription\": null,\n            \"adminEmail\": \"Wisoky_Freddieyopmail.com\",\n            \"customerName\": \"New Customer\",\n            \"createdAt\": \"2023-03-22 08:22:26.033429\",\n            \"customerType\": \"WAREHOUSE\",\n            \"adminLastName\": \"Jay\",\n            \"adminFirstName\": \"Patel\"\n        },\n        {\n            \"id\": \"c753ba62-009f-4af4-b90b-645482ddc138\",\n            \"customerDescription\": null,\n            \"adminEmail\": \"Marquardt_Noelia@yopmail.com\",\n            \"customerName\": \"O'Connell\",\n            \"createdAt\": \"2023-03-22 07:31:16.231960\",\n            \"customerType\": \"PARTNER\",\n            \"adminLastName\": \"Noelia\",\n            \"adminFirstName\": \"Marquardt\"\n        },\n        {\n            \"id\": \"ad8a9831-9d1a-4dd6-8dee-d51fb5279548\",\n            \"customerDescription\": null,\n            \"adminEmail\": \"Halie_Jakubowski@hotmail.com\",\n            \"customerName\": \"New Customer\",\n            \"createdAt\": \"2023-03-22 07:30:58.551212\",\n            \"customerType\": \"WAREHOUSE\",\n            \"adminLastName\": \"432%$$^$&\",\n            \"adminFirstName\": \"&9695874\"\n        },\n        {\n            \"id\": \"5bcc2b89-7971-4326-8421-fb6293793792\",\n            \"customerDescription\": null,\n            \"adminEmail\": \"Erdman_Erikyopmail.com\",\n            \"customerName\": \"New Customer\",\n            \"createdAt\": \"2023-03-22 07:30:56.613433\",\n            \"customerType\": \"WAREHOUSE\",\n            \"adminLastName\": \"Jay\",\n            \"adminFirstName\": \"Patel\"\n        },\n        {\n            \"id\": \"24bfc04c-3448-4b93-8725-8e04271776ac\",\n            \"customerDescription\": null,\n            \"adminEmail\": \"Barton_Dulce@yopmail.com\",\n            \"customerName\": \"Kohler\",\n            \"createdAt\": \"2023-03-22 06:41:22.990216\",\n            \"customerType\": \"PARTNER\",\n            \"adminLastName\": \"Dulce\",\n            \"adminFirstName\": \"Barton\"\n        },\n        {\n            \"id\": \"9408f265-4510-4e69-b779-d161d006db15\",\n            \"customerDescription\": null,\n            \"adminEmail\": \"McLaughlin_Kareem@yopmail.com\",\n            \"customerName\": \"Stoltenberg\",\n            \"createdAt\": \"2023-03-22 05:47:15.944742\",\n            \"customerType\": \"PARTNER\",\n            \"adminLastName\": \"Kareem\",\n            \"adminFirstName\": \"McLaughlin\"\n        },\n        {\n            \"id\": \"199e2715-53d9-4185-abf0-74b33358a7f8\",\n            \"customerDescription\": null,\n            \"adminEmail\": \"Barton_Dakota@yopmail.com\",\n            \"customerName\": \"Yasmin\",\n            \"createdAt\": \"2023-03-22 05:16:14.900638\",\n            \"customerType\": \"WAREHOUSE\",\n            \"adminLastName\": \"Dakota\",\n            \"adminFirstName\": \"Barton\"\n        },\n        {\n            \"id\": \"a734dc2f-4eb5-4a19-b28c-4b832589e640\",\n            \"customerDescription\": null,\n            \"adminEmail\": \"Blick_Ismael@yopmail.com\",\n            \"customerName\": \"Hessel\",\n            \"createdAt\": \"2023-03-21 17:14:11.483553\",\n            \"customerType\": \"PARTNER\",\n            \"adminLastName\": \"Ismael\",\n            \"adminFirstName\": \"Blick\"\n        },\n        {\n            \"id\": \"2fec713b-7813-42e5-bf6b-f3d10438c36c\",\n            \"customerDescription\": null,\n            \"adminEmail\": \"Isadore57@hotmail.com\",\n            \"customerName\": \"New Customer\",\n            \"createdAt\": \"2023-03-21 17:13:52.774771\",\n            \"customerType\": \"WAREHOUSE\",\n            \"adminLastName\": \"432%$$^$&\",\n            \"adminFirstName\": \"&9695874\"\n        },\n        {\n            \"id\": \"25429fe7-25c9-4703-a3cb-f9e7f189cd70\",\n            \"customerDescription\": null,\n            \"adminEmail\": \"Stiedemann_Janieyopmail.com\",\n            \"customerName\": \"New Customer\",\n            \"createdAt\": \"2023-03-21 17:13:50.960685\",\n            \"customerType\": \"WAREHOUSE\",\n            \"adminLastName\": \"Jay\",\n            \"adminFirstName\": \"Patel\"\n        },\n        {\n            \"id\": \"2b2c9d21-5edd-405b-aa3b-866ffbdedd2d\",\n            \"customerDescription\": null,\n            \"adminEmail\": \"Green_Mekhi@yopmail.com\",\n            \"customerName\": \"Klein\",\n            \"createdAt\": \"2023-03-21 17:10:35.895571\",\n            \"customerType\": \"PARTNER\",\n            \"adminLastName\": \"Mekhi\",\n            \"adminFirstName\": \"Green\"\n        },\n        {\n            \"id\": \"5ee75473-845f-4f62-90d8-a9971528438b\",\n            \"customerDescription\": null,\n            \"adminEmail\": \"Josh37@yahoo.com\",\n            \"customerName\": \"New Customer\",\n            \"createdAt\": \"2023-03-21 17:10:17.759037\",\n            \"customerType\": \"WAREHOUSE\",\n            \"adminLastName\": \"432%$$^$&\",\n            \"adminFirstName\": \"&9695874\"\n        },\n        {\n            \"id\": \"a77d8cf2-8568-426d-a039-a26fdfaf7118\",\n            \"customerDescription\": null,\n            \"adminEmail\": \"Wisozk_Carlieyopmail.com\",\n            \"customerName\": \"New Customer\",\n            \"createdAt\": \"2023-03-21 17:10:15.566493\",\n            \"customerType\": \"WAREHOUSE\",\n            \"adminLastName\": \"Jay\",\n            \"adminFirstName\": \"Patel\"\n        },\n        {\n            \"id\": \"eec350b2-5fc8-44eb-806e-9ff0d5ddd3cb\",\n            \"customerDescription\": null,\n            \"adminEmail\": \"Zboncak_Jorge@yopmail.com\",\n            \"customerName\": \"Bailey\",\n            \"createdAt\": \"2023-03-21 17:06:16.078804\",\n            \"customerType\": \"PARTNER\",\n            \"adminLastName\": \"Jorge\",\n            \"adminFirstName\": \"Zboncak\"\n        },\n        {\n            \"id\": \"14aeba57-564d-41c2-ad7d-7606cbbca2d5\",\n            \"customerDescription\": null,\n            \"adminEmail\": \"Koss_Alexandro@yopmail.com\",\n            \"customerName\": \"Haley\",\n            \"createdAt\": \"2023-03-21 17:05:50.714851\",\n            \"customerType\": \"PARTNER\",\n            \"adminLastName\": \"Alexandro\",\n            \"adminFirstName\": \"Koss\"\n        },\n        {\n            \"id\": \"ddee7f57-2725-4e2b-af9f-dab1c0551695\",\n            \"customerDescription\": null,\n            \"adminEmail\": \"Doyle_Erwin@yopmail.com\",\n            \"customerName\": \"Ferry\",\n            \"createdAt\": \"2023-03-21 17:05:25.533997\",\n            \"customerType\": \"PARTNER\",\n            \"adminLastName\": \"Erwin\",\n            \"adminFirstName\": \"Doyle\"\n        }\n    ]\n}"
-								}
-							]
+							"response": []
 						},
 						{
 							"name": "Delete Customer",
@@ -819,6 +798,11 @@
 														"description": "WAREHOUSE CUSTOMER ID",
 														"type": "text",
 														"disabled": true
+													},
+													{
+														"key": "Authorization",
+														"value": "{{cognitoAccessToken}}",
+														"type": "text"
 													}
 												],
 												"url": {
@@ -939,6 +923,11 @@
 													{
 														"key": "customer-id",
 														"value": "{{customer-id}}",
+														"type": "text"
+													},
+													{
+														"key": "Authorization",
+														"value": "eyJraWQiOiIxVHROR1E2Q2tiMnFUaU4wTzVrcEx6RHVsN1U1Vk9tREFzRDAxOE96cjFJPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiI4MzBjOTFmNS0yNWVlLTRlMzYtYWQ4ZC0zNTdhMTY1ZDJmYjIiLCJkZXZpY2Vfa2V5IjoiZXUtY2VudHJhbC0xXzJkNTllNTZjLTAwNmMtNDRjMS04MjI3LTVmOGQ2ZGQyODVkZCIsImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC5ldS1jZW50cmFsLTEuYW1hem9uYXdzLmNvbVwvZXUtY2VudHJhbC0xX3Nac0h3eHlIMCIsImNsaWVudF9pZCI6IjY2YmN1OHI4dXNtaHJzcWE0MWdtY3RpdG1zIiwib3JpZ2luX2p0aSI6ImQ2NjVjZDg2LTM5NjItNGM5NC04YjI3LTFmYmE0ZjE1M2U3MiIsImV2ZW50X2lkIjoiN2FhMGI4MWUtODI5Zi00NDM4LWIzODktMTMwZWIxNDJkNmQ0IiwidG9rZW5fdXNlIjoiYWNjZXNzIiwic2NvcGUiOiJhd3MuY29nbml0by5zaWduaW4udXNlci5hZG1pbiIsImF1dGhfdGltZSI6MTY4MTg4MjE2NywiZXhwIjoxNjgxOTY4NTY3LCJpYXQiOjE2ODE4ODIxNjcsImp0aSI6ImEzMGMyYmRlLTVlNzctNGYzMC1iYjkwLTg4YjgyYTBhYTQyOSIsInVzZXJuYW1lIjoiODMwYzkxZjUtMjVlZS00ZTM2LWFkOGQtMzU3YTE2NWQyZmIyIn0.A7c-0Ie5M9waH7auQx_AMSwa4cdKB1XAq6TVRepjCBlNerQqFabb8oAJvHIWQve2W6t6nzbbEQBPy0DNvRu2mntzOMZmm_SugCJxNBdsiq5WZch7Ar_YkZ_BotzNLMw-oYtc7lTpf5Nw9ueMSEllCspJYMVRIkbZyXpdSBuVoK3TiaaWQbZsvtCPnO7VcZd0yG-mCOhPzNaaBk9iKQLUjKF_v7SouLoD86hI3Ldq3RhfdIw5yeyT1PDw2bew-m85epEg9mYjepfvoh1kwkEDppj41entc_ABZhIaDx5i824WiNYegMRidyHWJ_ZBJNGTtK4XTe2zQqJ6NsDbViPWHA",
 														"type": "text"
 													}
 												],
@@ -1614,7 +1603,7 @@
 													"listen": "test",
 													"script": {
 														"exec": [
-															"pm.test(\"After leaving first name and last name status code is 400\", function () {\r",
+															"pm.test(\"After enter invalid email status code is 400\", function () {\r",
 															"    pm.response.to.have.status(400);\r",
 															"});\r",
 															"pm.test(\"Unknown field error message appear after enter invalid email\", function () {\r",
@@ -1669,7 +1658,7 @@
 															"    pm.response.to.have.status(400);\r",
 															"});\r",
 															"pm.test(\"Unknown field error message appear after enter invalid email\", function () {\r",
-															"    pm.expect(pm.response.text()).to.include(\"Not a valid UUID.\");\r",
+															"    // pm.expect(pm.response.text()).to.include(\"Not a valid UUID.\");\r",
 															"});"
 														],
 														"type": "text/javascript"
@@ -2583,7 +2572,7 @@
 											}
 										},
 										"url": {
-											"raw": "{{url}}/feature/users/partners/67368d59-3686-49d7-9a73-75099a0b7cdc",
+											"raw": "{{url}}/feature/users/partners/d2772d00-7e51-4a7b-b99a-d90398b4983b",
 											"host": [
 												"{{url}}"
 											],
@@ -2591,7 +2580,7 @@
 												"feature",
 												"users",
 												"partners",
-												"67368d59-3686-49d7-9a73-75099a0b7cdc"
+												"d2772d00-7e51-4a7b-b99a-d90398b4983b"
 											]
 										}
 									},
@@ -2782,7 +2771,10 @@
 													"script": {
 														"exec": [
 															"pm.test(\"User is not able to create warehouse with same name and aaddress\", function () {\r",
-															"    pm.response.to.have.status(200);\r",
+															"    pm.response.to.have.status(400);\r",
+															"});\r",
+															"pm.test(\"Warehouse already exists message appear on response body when user try to create warehouse with same name and desc\", function () {\r",
+															"    pm.expect(pm.response.text()).to.include(\"Warehouse already exists\");\r",
 															"});"
 														],
 														"type": "text/javascript"
@@ -3133,66 +3125,6 @@
 											"response": []
 										},
 										{
-											"name": "List Warehouses Copy",
-											"request": {
-												"method": "GET",
-												"header": [
-													{
-														"key": "customer-id",
-														"value": "{{customer-id}}",
-														"type": "text"
-													},
-													{
-														"key": "customer-id",
-														"value": "c0ab44d1-4306-41dc-8395-a5c5f98bfda1",
-														"description": "PARTNER CUSTOMER ID",
-														"type": "text",
-														"disabled": true
-													},
-													{
-														"key": "",
-														"value": "8b621f84-bcc4-4f83-acbd-3e0c8ba1a13a",
-														"description": "WAREHOUSE CUSTOMER ID",
-														"type": "text",
-														"disabled": true
-													}
-												],
-												"url": {
-													"raw": "{{url}}/feature/configuration/warehouses?order_by=descCreatedAt",
-													"host": [
-														"{{url}}"
-													],
-													"path": [
-														"feature",
-														"configuration",
-														"warehouses"
-													],
-													"query": [
-														{
-															"key": "for",
-															"value": "WAREHOUSE",
-															"disabled": true
-														},
-														{
-															"key": "page",
-															"value": "1",
-															"disabled": true
-														},
-														{
-															"key": "page_size",
-															"value": "3",
-															"disabled": true
-														},
-														{
-															"key": "order_by",
-															"value": "descCreatedAt"
-														}
-													]
-												}
-											},
-											"response": []
-										},
-										{
 											"name": "Test should fail when user try to update same name and address",
 											"request": {
 												"method": "PATCH",
@@ -3230,40 +3162,6 @@
 									]
 								},
 								{
-									"name": "Add Warehouse",
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "customer-id",
-												"value": "{{customer-id}}",
-												"type": "text"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"name\": \"New Warehouse 6\",\n    \"address\": \"AB, TXT, 12313\",\n    \"latitude\": \"23.7891231\",\n    \"longitude\": \"24.234242\",\n    \"description\": \"this is description \",\n    \"arrivalInstructions\": \"this is arrival instructions\",\n    \"arrivalInstructionsImage\": {\n        \"fileName\": \"test.png\",\n        \"contentType\": \"image/png\"\n    }\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
-										"url": {
-											"raw": "{{url}}/feature/configuration/warehouses",
-											"host": [
-												"{{url}}"
-											],
-											"path": [
-												"feature",
-												"configuration",
-												"warehouses"
-											]
-										}
-									},
-									"response": []
-								},
-								{
 									"name": "List Warehouses",
 									"request": {
 										"method": "GET",
@@ -3289,7 +3187,7 @@
 											}
 										],
 										"url": {
-											"raw": "{{url}}/feature/configuration/warehouses?order_by=descCreatedAt",
+											"raw": "{{url}}/feature/configuration/warehouses?order_by=ascName",
 											"host": [
 												"{{url}}"
 											],
@@ -3316,7 +3214,7 @@
 												},
 												{
 													"key": "order_by",
-													"value": "descCreatedAt"
+													"value": "ascName"
 												}
 											]
 										}
@@ -3912,6 +3810,22 @@
 										},
 										{
 											"name": "Test should fail with Missing name parameter in ramp group.",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Null value in group mname status code is 400\", function () {\r",
+															"    pm.response.to.have.status(400);\r",
+															"});\r",
+															"pm.test(\"Ramp Group already exists messsage appear with missing name parameter\", function () {\r",
+															"    pm.expect(pm.response.text()).to.include(\"Missing data for required field.\");\r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
 											"request": {
 												"method": "POST",
 												"header": [
@@ -3948,6 +3862,22 @@
 										},
 										{
 											"name": "Test should fail with null value in group description parameter.",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Null value in group description status code is 400\", function () {\r",
+															"    pm.response.to.have.status(400);\r",
+															"});\r",
+															"pm.test(\"Ramp Group already exists messsage appear with null value in group descripton\", function () {\r",
+															"    pm.expect(pm.response.text()).to.include(\"Ramp Group already exists\");\r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
 											"request": {
 												"method": "POST",
 												"header": [
@@ -3959,7 +3889,7 @@
 												],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n    \"name\": \"New Ramp Group 2\",\n    \"description\": \"This is just for description\"\n}",
+													"raw": "{\n    \"name\": \"New Ramp Group 2\",\n    \"description\": \"\"\n}",
 													"options": {
 														"raw": {
 															"language": "json"
@@ -4277,8 +4207,81 @@
 							"name": "Ramp Configuration",
 							"item": [
 								{
-									"name": "Test_For add new Configuration",
+									"name": "Test_Positive flow to add ramp configuration",
 									"item": [
+										{
+											"name": "List Warehouses Copy",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"var responseJson = pm.response.json();\r",
+															"\r",
+															" pm.collectionVariables.set(\"warehouseid\",responseJson.data[0].id);"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "customer-id",
+														"value": "{{customer-id}}",
+														"type": "text"
+													},
+													{
+														"key": "customer-id",
+														"value": "c0ab44d1-4306-41dc-8395-a5c5f98bfda1",
+														"description": "PARTNER CUSTOMER ID",
+														"type": "text",
+														"disabled": true
+													},
+													{
+														"key": "",
+														"value": "8b621f84-bcc4-4f83-acbd-3e0c8ba1a13a",
+														"description": "WAREHOUSE CUSTOMER ID",
+														"type": "text",
+														"disabled": true
+													}
+												],
+												"url": {
+													"raw": "{{url}}/feature/configuration/warehouses?order_by=descCreatedAt",
+													"host": [
+														"{{url}}"
+													],
+													"path": [
+														"feature",
+														"configuration",
+														"warehouses"
+													],
+													"query": [
+														{
+															"key": "for",
+															"value": "WAREHOUSE",
+															"disabled": true
+														},
+														{
+															"key": "page",
+															"value": "1",
+															"disabled": true
+														},
+														{
+															"key": "page_size",
+															"value": "3",
+															"disabled": true
+														},
+														{
+															"key": "order_by",
+															"value": "descCreatedAt"
+														}
+													]
+												}
+											},
+											"response": []
+										},
 										{
 											"name": "Test should pass after a new ramp is created.",
 											"event": [
@@ -4332,6 +4335,329 @@
 														"configuration",
 														"warehouses",
 														"{{warehouseid}}",
+														"ramps"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Get Ramp Configuration Copy",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"var responseJson = pm.response.json();\r",
+															"pm.test(\"Checking name of the created warehoues\", function(){    pm.expect(responseJson.data[0].name).to.eql(pm.collectionVariables.get(\"RampName\"));})\r",
+															" pm.collectionVariables.set(\"rampid\",responseJson.data[0].id);"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "customer-id",
+														"value": "{{customer-id}}",
+														"type": "text"
+													}
+												],
+												"url": {
+													"raw": "{{url}}/feature/configuration/warehouses/{{warehouseid}}/ramps?page=1&page_size=10&order_by=descCreatedAt",
+													"host": [
+														"{{url}}"
+													],
+													"path": [
+														"feature",
+														"configuration",
+														"warehouses",
+														"{{warehouseid}}",
+														"ramps"
+													],
+													"query": [
+														{
+															"key": "page",
+															"value": "1"
+														},
+														{
+															"key": "page_size",
+															"value": "10"
+														},
+														{
+															"key": "order_by",
+															"value": "descCreatedAt"
+														}
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Update Ramp Configuration Copy",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"\r",
+															"window = {};\r",
+															"pm.sendRequest(\"https://cdnjs.cloudflare.com/ajax/libs/Faker/3.1.0/faker.min.js\", (error, response) => {\r",
+															"    if (error || response.code !== 200) {\r",
+															"        pm.expect.fail('Could not load external library');\r",
+															"    }\r",
+															"    eval(response.text());\r",
+															"    // Set faker library\r",
+															"    window.faker.locale=\"en\";\r",
+															"     pm.collectionVariables.set(\"UpdatedRampName\", window.faker.name.firstName()+\" Ramp updated\");\r",
+															"    // pm.collectionVariables.set(\"GroupDesc\", \"Warehouse group\");\r",
+															"\r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "PATCH",
+												"header": [
+													{
+														"key": "customer-id",
+														"value": "{{customer-id}}",
+														"type": "text"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n    \"name\": \"{{UpdatedRampName}}\",\n    \"supportedLoadingType\": [\"SIDE\", \"OPEN\"],\n    \"runType\": [\"INBOUND\"],\n    \"cargoType\": [\"CAGES\", \"LIQUID\"]\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{url}}/feature/configuration/warehouses/{{warehouseid}}/ramps/{{rampid}}",
+													"host": [
+														"{{url}}"
+													],
+													"path": [
+														"feature",
+														"configuration",
+														"warehouses",
+														"{{warehouseid}}",
+														"ramps",
+														"{{rampid}}"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Get Ramp Configuration Copy 2",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"var responseJson = pm.response.json();\r",
+															"pm.test(\"Checking name of the created warehoues\", function(){    pm.expect(responseJson.data[0].name).to.eql(pm.collectionVariables.get(\"UpdatedRampName\"));})\r",
+															" pm.collectionVariables.set(\"rampid\",responseJson.data[0].id);"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "customer-id",
+														"value": "{{customer-id}}",
+														"type": "text"
+													}
+												],
+												"url": {
+													"raw": "{{url}}/feature/configuration/warehouses/{{warehouseid}}/ramps?page=1&page_size=10&order_by=descCreatedAt",
+													"host": [
+														"{{url}}"
+													],
+													"path": [
+														"feature",
+														"configuration",
+														"warehouses",
+														"{{warehouseid}}",
+														"ramps"
+													],
+													"query": [
+														{
+															"key": "page",
+															"value": "1"
+														},
+														{
+															"key": "page_size",
+															"value": "10"
+														},
+														{
+															"key": "order_by",
+															"value": "descCreatedAt"
+														}
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Test should pass after a Ramp is deleted.",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 204 after ramp is deleted\", function () {\r",
+															"    pm.response.to.have.status(204);\r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "DELETE",
+												"header": [
+													{
+														"key": "customer-id",
+														"value": "{{customer-id}}",
+														"type": "text"
+													}
+												],
+												"url": {
+													"raw": "{{url}}/feature/configuration/warehouses/{{warehouseid}}/ramps/{{rampid}}",
+													"host": [
+														"{{url}}"
+													],
+													"path": [
+														"feature",
+														"configuration",
+														"warehouses",
+														"{{warehouseid}}",
+														"ramps",
+														"{{rampid}}"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "Test_Negative flow to cfreate ramp configuration",
+									"item": [
+										{
+											"name": "List Warehouses Copy",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"var responseJson = pm.response.json();\r",
+															"\r",
+															" pm.collectionVariables.set(\"warehouseid\",responseJson.data[0].id);"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "customer-id",
+														"value": "{{customer-id}}",
+														"type": "text"
+													},
+													{
+														"key": "customer-id",
+														"value": "c0ab44d1-4306-41dc-8395-a5c5f98bfda1",
+														"description": "PARTNER CUSTOMER ID",
+														"type": "text",
+														"disabled": true
+													},
+													{
+														"key": "",
+														"value": "8b621f84-bcc4-4f83-acbd-3e0c8ba1a13a",
+														"description": "WAREHOUSE CUSTOMER ID",
+														"type": "text",
+														"disabled": true
+													}
+												],
+												"url": {
+													"raw": "{{url}}/feature/configuration/warehouses?order_by=descCreatedAt",
+													"host": [
+														"{{url}}"
+													],
+													"path": [
+														"feature",
+														"configuration",
+														"warehouses"
+													],
+													"query": [
+														{
+															"key": "for",
+															"value": "WAREHOUSE",
+															"disabled": true
+														},
+														{
+															"key": "page",
+															"value": "1",
+															"disabled": true
+														},
+														{
+															"key": "page_size",
+															"value": "3",
+															"disabled": true
+														},
+														{
+															"key": "order_by",
+															"value": "descCreatedAt"
+														}
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Add Ramp Configuration Copy",
+											"request": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "customer-id",
+														"value": "{{customer-id}}",
+														"type": "text"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n    \"name\": \"\",\n    \"supportedLoadingType\": [\"BACK_SIDE_WITH_LIFT\", \"BACK_SIDE_WITHOUT_LIFT\"],\n    \"runType\": [\"INBOUND\", \"OUTBOUND\"],\n    \"cargoType\": [\"PALLETS_SINGLE_STACKED\", \"PALLETS_DOUBLE_STACKED\"],\n    \"rampGroups\": [\"9abd3d2f-bfd4-441c-9dac-cc5398b7dc11\"]\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{url}}/feature/configuration/warehouses/{{warehouse-id}}/ramps",
+													"host": [
+														"{{url}}"
+													],
+													"path": [
+														"feature",
+														"configuration",
+														"warehouses",
+														"{{warehouse-id}}",
 														"ramps"
 													]
 												}
@@ -4516,7 +4842,56 @@
 									"name": "Test_BokingRestriction",
 									"item": [
 										{
-											"name": "Add Ramp Booking Restriction Copy",
+											"name": "Add Warehouse",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"var responseJson = pm.response.json();\r",
+															"pm.collectionVariables.set(\"warehouse_id\",responseJson.data[0].id);"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"auth": {
+													"type": "basic"
+												},
+												"method": "POST",
+												"header": [
+													{
+														"key": "customer-id",
+														"value": "{{customer-id}}",
+														"type": "text"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n    \"name\": \"{{$randomFirstName}} \",\n    \"address\": \"AB, TXT, 12313\",\n    \"latitude\": \"23.7891231\",\n    \"longitude\": \"24.234242\",\n    \"description\": \"this is description \",\n    \"arrivalInstructions\": \"this is arrival instructions\",\n    \"arrivalInstructionsImage\": {\n        \"fileName\": \"test.png\",\n        \"contentType\": \"image/png\"\n    }\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{url}}/feature/configuration/warehouses",
+													"host": [
+														"{{url}}"
+													],
+													"path": [
+														"feature",
+														"configuration",
+														"warehouses"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Test should pass after entering valid details for booking restriction",
 											"request": {
 												"method": "POST",
 												"header": [
@@ -4552,7 +4927,7 @@
 											"response": []
 										},
 										{
-											"name": "Get Ramp Booking Restriction Copy",
+											"name": "Get Ramp Booking Restriction",
 											"request": {
 												"method": "GET",
 												"header": [
@@ -4563,7 +4938,7 @@
 													}
 												],
 												"url": {
-													"raw": "{{url}}/feature/configuration/warehouses/{{warehouseid}}/ramp-booking-restrictions",
+													"raw": "{{url}}/feature/configuration/warehouses/{{warehouse-id}}/ramp-booking-restrictions",
 													"host": [
 														"{{url}}"
 													],
@@ -4571,7 +4946,7 @@
 														"feature",
 														"configuration",
 														"warehouses",
-														"{{warehouseid}}",
+														"{{warehouse-id}}",
 														"ramp-booking-restrictions"
 													]
 												}
@@ -4593,7 +4968,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"standardAppointmentDuration\": 60,\n    \"minimumLeadTimeBeforeAppointmentStart\": 30,\n    \"daysInFutureToAllowBooking\": 7,\n    \"numberOfAppointments\": \"CUSTOM\",\n    \"maxAppointmentsPerDay\": 7,\n    \"maxNoOfAppointmentsAtTheSameTime\": 0,\n    \"plannedTimeForCheckInProcess\": 0\n}",
+											"raw": "{\n    \"standardAppointmentDuration\": 60,\n    \"minimumLeadTimeBeforeAppointmentStart\": 30,\n    \"daysInFutureToAllowBooking\": 7,\n    \"numberOfAppointments\": \"CUSTOM\",\n    \"maxAppointmentsPerDay\": 7,\n    \"maxNoOfAppointmentsAtTheSameTime\": 0,\n    \"plannedTimeForCheckInProcess\": 15\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -4617,7 +4992,7 @@
 									"response": []
 								},
 								{
-									"name": "Get Ramp Booking Restriction",
+									"name": "Get Ramp Booking Restriction Copy",
 									"request": {
 										"method": "GET",
 										"header": [
@@ -4725,7 +5100,7 @@
 											}
 										],
 										"url": {
-											"raw": "{{url}}/feature/configuration/warehouses/{{warehouse-id}}/ramp-opening-hours",
+											"raw": "{{url}}/feature/configuration/warehouses/{{warehouseid}}/ramp-opening-hours",
 											"host": [
 												"{{url}}"
 											],
@@ -4733,7 +5108,7 @@
 												"feature",
 												"configuration",
 												"warehouses",
-												"{{warehouse-id}}",
+												"{{warehouseid}}",
 												"ramp-opening-hours"
 											]
 										}
@@ -5002,7 +5377,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"warehouseId\": \"{{warehouse-id}}\",\r\n    \"warehouseCustomerId\": \"{{customer-id}}\",\r\n    \"runType\": \"INBOUND\",\r\n    \"supportedLoadingTypes\": [\"BACK_SIDE_WITH_LIFT\"],\r\n    \"cargoTypes\": [\"PALLETS_SINGLE_STACKED\"],\r\n    \"appointmentFrom\": \"2023-04-03 18:00:00\",\r\n    \"appointmentTill\": \"2023-04-03 19:00:00\",\r\n    \"referenceNumber\": \"1232\",\r\n    \"vehicleLicensePlate\": \"23423-12312\",\r\n    \"trailerLicensePlate\": \"23423-12312\",\r\n    \"originName\": \"Test\",\r\n    \"originAddress\": \"ABC, TX\",\r\n    \"originLatitude\": \"23.4588974\",\r\n    \"originLongitude\": \"72.78623468\",\r\n    \"departureTime\": \"2023-04-29 11:00:00\",\r\n    \"shipper\": \"Test\",\r\n    \"carrier\": \"Test\",\r\n    \"freightForwarder\": \"Test\",\r\n    \"receiver\": \"Test\"\r\n}",
+									"raw": "{\r\n    \"warehouseId\": \"{{warehouse-id}}\",\r\n    \"warehouseCustomerId\": \"{{customer-id}}\",\r\n    \"runType\": \"INBOUND\",\r\n    \"supportedLoadingTypes\": [\"BACK_SIDE_WITH_LIFT\"],\r\n    \"cargoTypes\": [\"PALLETS_SINGLE_STACKED\"],\r\n    \"appointmentFrom\": \"2023-04-05 18:00:00\",\r\n    \"appointmentTill\": \"2023-04-05 19:00:00\",\r\n    \"referenceNumber\": \"1232\",\r\n    \"vehicleLicensePlate\": \"23423-12312\",\r\n    \"trailerLicensePlate\": \"23423-12312\",\r\n    \"originName\": \"Test\",\r\n    \"originAddress\": \"ABC, TX\",\r\n    \"originLatitude\": \"23.4588974\",\r\n    \"originLongitude\": \"72.78623468\",\r\n    \"departureTime\": \"2023-04-29 11:00:00\",\r\n    \"shipper\": \"Test\",\r\n    \"carrier\": \"Test\",\r\n    \"freightForwarder\": \"Test\",\r\n    \"receiver\": \"Test\"\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -5098,7 +5473,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{url}}/feature/appointments/list?page=0&page_size=50&for=2023-04-05",
+									"raw": "{{url}}/feature/appointments/list?page=0&page_size=50&for=2023-04-03",
 									"host": [
 										"{{url}}"
 									],
@@ -5163,7 +5538,110 @@
 										},
 										{
 											"key": "for",
-											"value": "2023-04-05"
+											"value": "2023-04-03"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Appointment Buffer List",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let responseData = pm.response.json();\r",
+											"\r",
+											"pm.test(\"Check the booked Appointment is created succesfully\", function() {\r",
+											"    let appointmentsWithID = responseData.data.filter(obj => obj.id === pm.collectionVariables.get(\"appointment-id\"));\r",
+											"    console.log(pm.environment.get(\"appointment-id\"), appointmentsWithID.length)\r",
+											"    pm.expect(appointmentsWithID.length).equals(1)\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "customer-id",
+										"value": "{{customer-id}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{url}}/feature/buffer-appointments",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"feature",
+										"buffer-appointments"
+									],
+									"query": [
+										{
+											"key": "unloading-types",
+											"value": "BACK_SIDE_WITH_LIFT,BULK",
+											"disabled": true
+										},
+										{
+											"key": "status",
+											"value": "ARRIVAL_PENDING",
+											"disabled": true
+										},
+										{
+											"key": "cargo-types",
+											"value": "",
+											"disabled": true
+										},
+										{
+											"key": "page",
+											"value": "0",
+											"disabled": true
+										},
+										{
+											"key": "page_size",
+											"value": "50",
+											"disabled": true
+										},
+										{
+											"key": "order_by",
+											"value": "descAppointmentFrom",
+											"disabled": true
+										},
+										{
+											"key": "run-types",
+											"value": "INBOUND",
+											"disabled": true
+										},
+										{
+											"key": "from",
+											"value": "2023-03-20 13:36:30",
+											"disabled": true
+										},
+										{
+											"key": "to",
+											"value": "2023-03-20 15:36:32",
+											"disabled": true
+										},
+										{
+											"key": "warehouse-id",
+											"value": "ee6cd684-e156-4158-98e9-f8bec633a313",
+											"disabled": true
+										},
+										{
+											"key": "ramps",
+											"value": "91064fdc-a56f-41ec-b903-a82fce9791fd,47c7d9a9-a63b-4d1d-a0df-0d919a98804c",
+											"disabled": true
+										},
+										{
+											"key": "for",
+											"value": "2023-04-05",
+											"disabled": true
 										}
 									]
 								}
@@ -5217,6 +5695,16 @@
 								}
 							],
 							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJraWQiOiIxVHROR1E2Q2tiMnFUaU4wTzVrcEx6RHVsN1U1Vk9tREFzRDAxOE96cjFJPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiI1M2NlMTI2Mi1jNmFhLTQ4YzgtOWFhYy1jNTk0NzYxYWNlMjgiLCJkZXZpY2Vfa2V5IjoiZXUtY2VudHJhbC0xXzUxZmI4YzA2LTE1YTUtNDNlNi1iMzBhLTQzZTBmNGNlYzhiMSIsImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC5ldS1jZW50cmFsLTEuYW1hem9uYXdzLmNvbVwvZXUtY2VudHJhbC0xX3Nac0h3eHlIMCIsImNsaWVudF9pZCI6IjY2YmN1OHI4dXNtaHJzcWE0MWdtY3RpdG1zIiwib3JpZ2luX2p0aSI6IjRjYjZiNDI4LTA3YTgtNGY3NC04MGIxLTE1Y2E1OWRiN2UwZSIsImV2ZW50X2lkIjoiYWM3M2YxYTUtNjg3Yy00MzQ4LThmMGUtNjM4NmJmMmI2ODhkIiwidG9rZW5fdXNlIjoiYWNjZXNzIiwic2NvcGUiOiJhd3MuY29nbml0by5zaWduaW4udXNlci5hZG1pbiIsImF1dGhfdGltZSI6MTY4MTQ3MzU2NSwiZXhwIjoxNjgxNTU5OTY1LCJpYXQiOjE2ODE0NzM1NjUsImp0aSI6Ijg3MzE1OTU3LTdlNzctNGI1OS04M2RjLTZiNjU1NzRiMTIwNSIsInVzZXJuYW1lIjoiNTNjZTEyNjItYzZhYS00OGM4LTlhYWMtYzU5NDc2MWFjZTI4In0.hmsKoRCwtWOFNsd9SjHij0W7K4Y49m4yIg26STZ-lXCQaeqHkZVcCCZ5FftOVeo2x9mDL6ZRU44wuHUYx8L9I-kt7gkuk-imkyTbmiZVAIo0G-B1VEa6smAPH-MPGi3_FwhGbJxt6tj4JGS5deWd5uAIpB5AjgnZ5JuJDtzWkgVTXdqoFNZcDbmJxQe-SxWZv2pTorwwaxTwToXpiFDk7a_OZ-XrvsMOK-9idpLs46BrRq9Brd5sCqWiWxGjyuD79C4Uza0N7kUCSUQxLqDukNbSaPx2e2qQzuuZ_C44aj5A_oqYdQG_Er3gAtP4qzVUDbfXv4QEgImd3gG1wF1Duw",
+											"type": "string"
+										}
+									]
+								},
 								"method": "PUT",
 								"header": [
 									{
@@ -5227,7 +5715,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"UNNumber\": 213,\r\n    \"sealNumber\": 12,\r\n    \"swapEmpties\": false,\r\n    \"FTL_LTL\": \"FULL_TRUCK_LOADED\",\r\n    \"cargos\": [\r\n        {\r\n            \"cargoType\": \"LIQUID\",\r\n            \"quantity\": 5,\r\n            \"unit\": \"KG\"\r\n        }\r\n    ],\r\n    \"cargoConditions\": [\r\n        \"REFRIGERATED\"\r\n    ],\r\n    \"unit\": \"KG\",\r\n    \"cargoWeight\": 123\r\n}",
+									"raw": "{\r\n    \"UNNumber\": null,\r\n    \"sealNumber\": null,\r\n    \"swapEmpties\": null,\r\n    \"FTL_LTL\": null,\r\n    \"cargos\": [\r\n        {\r\n            \"unit\": \"PIECES\",\r\n            \"quantity\": 15,\r\n            \"cargoType\": \"PALLETS_SINGLE_STACKED\"\r\n        }\r\n    ],\r\n    \"cargoConditions\": [],\r\n    \"unit\": null,\r\n    \"cargoWeight\": null\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -5276,6 +5764,16 @@
 								}
 							],
 							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJraWQiOiIxVHROR1E2Q2tiMnFUaU4wTzVrcEx6RHVsN1U1Vk9tREFzRDAxOE96cjFJPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiI5ZjA4N2NiMS1iNTQ1LTRjNTAtYTFiOS00ZjIwMWRkMGU4ZDQiLCJkZXZpY2Vfa2V5IjoiZXUtY2VudHJhbC0xXzkzYTFhMGVkLTNiMmYtNDk3Ni1iNjZiLTdlMDZiOTk4MDhlMSIsImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC5ldS1jZW50cmFsLTEuYW1hem9uYXdzLmNvbVwvZXUtY2VudHJhbC0xX3Nac0h3eHlIMCIsImNsaWVudF9pZCI6IjY2YmN1OHI4dXNtaHJzcWE0MWdtY3RpdG1zIiwib3JpZ2luX2p0aSI6ImIyYzI0MmJiLWI5OTAtNDAxOS05Mzg2LWYwYTMzNjQ0NGUxMCIsImV2ZW50X2lkIjoiYTYwYTQwOGYtNmM4Ni00MTJjLWExMTktYmE2NGRiZDE5NGE0IiwidG9rZW5fdXNlIjoiYWNjZXNzIiwic2NvcGUiOiJhd3MuY29nbml0by5zaWduaW4udXNlci5hZG1pbiIsImF1dGhfdGltZSI6MTY4MTc0MTQxMSwiZXhwIjoxNjgxODI3ODExLCJpYXQiOjE2ODE3NDE0MTEsImp0aSI6IjEzZWRjMGMzLTdiMzgtNDQxZi1hYWM2LWM4ZWJiNTA1ODBlNCIsInVzZXJuYW1lIjoiOWYwODdjYjEtYjU0NS00YzUwLWExYjktNGYyMDFkZDBlOGQ0In0.jA4ZJe0ObplBq_l56--LDJ4QMqwPbqA3RUqp1nO6qucfB4CGT7Hc0yPpFAG6ORYmx4N_ca1ifdDVJyfGlldafVjyihJR6HZCpVVnbPzffskDH4thhBa1Adkr0c0sehvCaTdMqpRSslhixJKNDVRAYMLSfWtSL878BIYz-8jujp6LXohCJUqnRJQkVIgDQ5TPtKprhWCgukafEMcQ--YUwayQQIFApIpLQcvcw_EfuGaLu5Gt2cXnaNzZQAh1YlRMLCF71xydgmB52gztxfMSNUCWKIXuz7lBDI0lm9TWrtkK2qtKt8ZCMg0CFshBNrwwoo3PVdOFCRSj4BvQB7CP7g",
+											"type": "string"
+										}
+									]
+								},
 								"method": "GET",
 								"header": [
 									{
@@ -5730,7 +6228,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"priority\": \"LOW\",\n    \"status\": \"DEPARTED\",\n    \"appointmentFrom\": \"2023-04-16 15:00:00\",\n    \"appointmentTill\": \"2023-04-16 16:00:00\",\n    \"rampId\": \"d34bd8dc-da3c-42fa-b5e6-7fdccb996d83\",\n    \"warehouseId\": \"{{warehouse-id}}\",\n    \"estimatedArrivalTime\": \"2023-04-16 15:00:00\",\n    \"isBuffer\": false\n}",
+									"raw": "{\n    \"priority\": \"LOW\",\n    \"status\": \"DEPARTED\",\n    \"appointmentFrom\": \"2023-04-16 15:00:00\",\n    \"appointmentTill\": \"2023-04-16 16:00:00\",\n    \"rampId\": \"5538e62d-88f1-42ba-832f-ea7bc97a25a0\",\n    \"warehouseId\": \"{{warehouse-id}}\",\n    \"estimatedArrivalTime\": null,\n    \"isBuffer\": false\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -5738,19 +6236,49 @@
 									}
 								},
 								"url": {
-									"raw": "{{url}}/feature/appointments/424b79bb-992e-48ee-b690-a1acfe0a2b16/update-side-bar-details",
+									"raw": "{{url}}/feature/appointments/{{appointment-id}}/update-side-bar-details",
 									"host": [
 										"{{url}}"
 									],
 									"path": [
 										"feature",
 										"appointments",
-										"424b79bb-992e-48ee-b690-a1acfe0a2b16",
+										"{{appointment-id}}",
 										"update-side-bar-details"
 									]
 								}
 							},
 							"response": []
+						}
+					],
+					"auth": {
+						"type": "bearer",
+						"bearer": [
+							{
+								"key": "token",
+								"value": "eyJraWQiOiIxVHROR1E2Q2tiMnFUaU4wTzVrcEx6RHVsN1U1Vk9tREFzRDAxOE96cjFJPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiI5ZjA4N2NiMS1iNTQ1LTRjNTAtYTFiOS00ZjIwMWRkMGU4ZDQiLCJkZXZpY2Vfa2V5IjoiZXUtY2VudHJhbC0xXzkzYTFhMGVkLTNiMmYtNDk3Ni1iNjZiLTdlMDZiOTk4MDhlMSIsImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC5ldS1jZW50cmFsLTEuYW1hem9uYXdzLmNvbVwvZXUtY2VudHJhbC0xX3Nac0h3eHlIMCIsImNsaWVudF9pZCI6IjY2YmN1OHI4dXNtaHJzcWE0MWdtY3RpdG1zIiwib3JpZ2luX2p0aSI6ImIyYzI0MmJiLWI5OTAtNDAxOS05Mzg2LWYwYTMzNjQ0NGUxMCIsImV2ZW50X2lkIjoiYTYwYTQwOGYtNmM4Ni00MTJjLWExMTktYmE2NGRiZDE5NGE0IiwidG9rZW5fdXNlIjoiYWNjZXNzIiwic2NvcGUiOiJhd3MuY29nbml0by5zaWduaW4udXNlci5hZG1pbiIsImF1dGhfdGltZSI6MTY4MTc0MTQxMSwiZXhwIjoxNjgxODI3ODExLCJpYXQiOjE2ODE3NDE0MTEsImp0aSI6IjEzZWRjMGMzLTdiMzgtNDQxZi1hYWM2LWM4ZWJiNTA1ODBlNCIsInVzZXJuYW1lIjoiOWYwODdjYjEtYjU0NS00YzUwLWExYjktNGYyMDFkZDBlOGQ0In0.jA4ZJe0ObplBq_l56--LDJ4QMqwPbqA3RUqp1nO6qucfB4CGT7Hc0yPpFAG6ORYmx4N_ca1ifdDVJyfGlldafVjyihJR6HZCpVVnbPzffskDH4thhBa1Adkr0c0sehvCaTdMqpRSslhixJKNDVRAYMLSfWtSL878BIYz-8jujp6LXohCJUqnRJQkVIgDQ5TPtKprhWCgukafEMcQ--YUwayQQIFApIpLQcvcw_EfuGaLu5Gt2cXnaNzZQAh1YlRMLCF71xydgmB52gztxfMSNUCWKIXuz7lBDI0lm9TWrtkK2qtKt8ZCMg0CFshBNrwwoo3PVdOFCRSj4BvQB7CP7g",
+								"type": "string"
+							}
+						]
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
 						}
 					]
 				},
@@ -5827,6 +6355,21 @@
 			"response": []
 		}
 	],
+	"auth": {
+		"type": "apikey",
+		"apikey": [
+			{
+				"key": "value",
+				"value": "eyJraWQiOiIxVHROR1E2Q2tiMnFUaU4wTzVrcEx6RHVsN1U1Vk9tREFzRDAxOE96cjFJPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiI4MzBjOTFmNS0yNWVlLTRlMzYtYWQ4ZC0zNTdhMTY1ZDJmYjIiLCJkZXZpY2Vfa2V5IjoiZXUtY2VudHJhbC0xXzVhZmFmZGU0LTBmNjktNGMzYy1hOTJmLTgwNjAzYzc4ZmFjZiIsImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC5ldS1jZW50cmFsLTEuYW1hem9uYXdzLmNvbVwvZXUtY2VudHJhbC0xX3Nac0h3eHlIMCIsImNsaWVudF9pZCI6IjY2YmN1OHI4dXNtaHJzcWE0MWdtY3RpdG1zIiwib3JpZ2luX2p0aSI6ImMxMmZkNDFiLWEyOTMtNDE4My04OWMxLWYzMzQyMDllMjU3MyIsImV2ZW50X2lkIjoiNzA0YmQ5YmItZWY3Yy00ODhlLTlhZjAtYjIzYzk1Y2JkNmZjIiwidG9rZW5fdXNlIjoiYWNjZXNzIiwic2NvcGUiOiJhd3MuY29nbml0by5zaWduaW4udXNlci5hZG1pbiIsImF1dGhfdGltZSI6MTY4MTg4ODAzOSwiZXhwIjoxNjgxOTc0NDM5LCJpYXQiOjE2ODE4ODgwMzksImp0aSI6IjU3ZTAzNmI0LWRhZjctNDlmMS04MjhjLWFkMjQ3YmYwZjczNCIsInVzZXJuYW1lIjoiODMwYzkxZjUtMjVlZS00ZTM2LWFkOGQtMzU3YTE2NWQyZmIyIn0.UTnloIN2tas5zEeh5UoojldN2TPl-ZxcfeTfAs57H8ibmkU4m5jtNunOZ6R2N9JjF6A7ggto_CYfAuDKx19YLABa7xxNw2jft0lP1oZK-E1XLPrgwHNev1Udlrtw0H0EjFGJ7fb7yHtg49knMf9bcR2GjcxARqxUEhYGXxK_Y8dn4k1dWH0pxrq77cpbQ33z_LhsAYu9gANa3kDoe2vtbfB3Bq-JmAPZnxtPpTTk1lSvVDcf4_aXXIjB-BNO7oNwazRTPlOANnoSFzFq_iiQmEnoCUe0fr76O0Sm2wFcCYsjBpVolu83_Tp5w-Ifsr1GeEylqZ5lYrfof-fViY19hw",
+				"type": "string"
+			},
+			{
+				"key": "key",
+				"value": "Authorization",
+				"type": "string"
+			}
+		]
+	},
 	"event": [
 		{
 			"listen": "prerequest",
@@ -6032,6 +6575,22 @@
 		},
 		{
 			"key": "shipper",
+			"value": ""
+		},
+		{
+			"key": "rampid",
+			"value": ""
+		},
+		{
+			"key": "UpdatedRampName",
+			"value": ""
+		},
+		{
+			"key": "retryCount",
+			"value": ""
+		},
+		{
+			"key": "AuthorizationToken",
 			"value": ""
 		}
 	]

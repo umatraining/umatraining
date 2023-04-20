@@ -10,26 +10,22 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [12.x]
-        mongodb-version: [4.2]
+ 
     steps:
     - uses: actions/checkout@v3
     - name: Check out Git repositor
-    - name: Set up Node.js
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-        registry-url: https://registry.npmjs.org/
-    - name: Start MongoDB ${{ matrix.mongodb-version }}
-      uses: supercharge/mongodb-github-action@1.3.0
-      with:
-        mongodb-version: ${{ matrix.mongodb-version }}
     - name: Install dependencies
-      run: npm install
-    - name: Install newman
-      run: npm install -g newman
+      run: |
+       mkdir SampleArtifact
+    - name: Check out Git repositor
+      uses: actions/checkout@v3
+      with:
+        node-version : '17.x'
+        # Install newman and reporter
+    - name: Install newman   
+      run: |
+       npm install -g newman
+       npm install -g newman-reporter-htmlextra
     - name: Seed mongo
       run: mongo 127.0.0.1/infinite-digital-postman-tests  test/postman/setup.js
     - name: Run the API and Postman's tests
