@@ -26,15 +26,11 @@ jobs:
       run: |
        npm install -g newman
        npm install -g newman-reporter-htmlextra
-    - name: Seed mongo
-      run: mongo 127.0.0.1/infinite-digital-postman-tests  test/postman/setup.js
-    - name: Run the API and Postman's tests
-      run: | 
-       npm run start:dev &
-       sleep 60
-       newman run "Example.postman_collection.json"
-    env:
-      MONGO_URI: "mongodb://127.0.0.1:27017/test-db"
-      PORT: "3000"
-      STAGE: "local"
-      NODE_ENV: "develop"  
+    - name: Run collection
+      run: |
+       newman run "NorthBound.postman_collection.json" -e "NorthBoundDev.postman_environment.json" -g "workspace.postman_globals.json" -r htmlextra ---reporter-htmlextrs-export SampleArtifact/report.html
+    - name: publish report
+      uses: actions/checkout@v3
+      with:
+       name: Reports
+       path: SampleArtifact
