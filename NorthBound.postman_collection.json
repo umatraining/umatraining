@@ -13,296 +13,6 @@
 					"name": "Customer",
 					"item": [
 						{
-							"name": "Test_NegativeTest cases",
-							"item": [
-								{
-									"name": "Test should fail with invalid email for customer",
-									"event": [
-										{
-											"listen": "prerequest",
-											"script": {
-												"exec": [
-													"\r",
-													"window = {};\r",
-													"pm.sendRequest(\"https://cdnjs.cloudflare.com/ajax/libs/Faker/3.1.0/faker.min.js\", (error, response) => {\r",
-													"    if (error || response.code !== 200) {\r",
-													"        pm.expect.fail('Could not load external library');\r",
-													"    }\r",
-													"    eval(response.text());\r",
-													"    // Set faker library\r",
-													"    window.faker.locale=\"en\";\r",
-													"    emailid=pm.collectionVariables.get(\"firstname\")+\"_\"+pm.collectionVariables.get(\"lastname\")+\"yopmail.com\";\r",
-													"    pm.collectionVariables.set(\"invalidEmailCustomer\",emailid);\r",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										},
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													"pm.test(\"Status code for invalid customer is 400\", function () {\r",
-													"    pm.response.to.have.status(400);\r",
-													"});\r",
-													"pm.test(\"Not a valid email address. error message appear\", function () {\r",
-													"    pm.expect(pm.response.text()).to.include(\"Not a valid email address.\");\r",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\r\n    \"adminLastName\": \"Jay\",\r\n    \"adminFirstName\": \"Patel\",\r\n    \"customerName\": \"New Customer\",\r\n    \"adminEmail\": \"{{invalidEmailCustomer}}\",\r\n    \"customerType\": \"WAREHOUSE\"\r\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
-										"url": {
-											"raw": "{{url}}/feature/customers",
-											"host": [
-												"{{url}}"
-											],
-											"path": [
-												"feature",
-												"customers"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Test should fail if email id is alredy is existed",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													"//user already exist\r",
-													"pm.test(\"Verify Message User is already exist in account for customer\", function (){\r",
-													"    pm.response.to.have.body(\"{\\\"message\\\": \\\"User already exists\\\"}\\n\")\r",
-													"});\r",
-													"pm.test(\"Status code of existed user for customer\", function () {\r",
-													"    pm.response.to.have.status(400);\r",
-													"});\r",
-													"pm.test(\"Response time for existed email for customer\" +pm.response.responseTime+\" ms\", function () {\r",
-													"    // pm.expect(pm.response.responseTime).to.be.below(200);\r",
-													"});\r",
-													"pm.test(\"Status code for existed customer name has Bad Request\", function () {    \r",
-													"    pm.response.to.have.status(\"Bad Request\");});\r",
-													"pm.test(\"Content-Type header is present\", () => {\r",
-													"  pm.response.to.have.header(\"Content-Type\");\r",
-													"});\r",
-													"pm.test(\"Content-Type header is application/json\", () => {\r",
-													"  pm.expect(pm.response.headers.get('Content-Type')).to.eql('application/json');\r",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\r\n    \"adminLastName\": \"Jay\",\r\n    \"adminFirstName\": \"Patel\",\r\n    \"customerName\": \"New Customer\",\r\n    \"adminEmail\": \"adminnorth02@yopmail.com\",\r\n    \"customerType\": \"WAREHOUSE\"\r\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
-										"url": {
-											"raw": "{{url}}/feature/customers",
-											"host": [
-												"{{url}}"
-											],
-											"path": [
-												"feature",
-												"customers"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Test should fail after enter special character and number in text field",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													"\r",
-													"pm.test(\"Status code is 400 after enter special character and number in name text field\", function () {\r",
-													"    pm.response.to.have.status(400);\r",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\r\n    \"adminLastName\": \"432%$$^$&\",\r\n    \"adminFirstName\": \"&9695874\",\r\n    \"customerName\": \"New Customer\",\r\n    \"adminEmail\": \"{{$randomEmail}}\",\r\n    \"customerType\": \"WAREHOUSE\"\r\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
-										"url": {
-											"raw": "{{url}}/feature/customers",
-											"host": [
-												"{{url}}"
-											],
-											"path": [
-												"feature",
-												"customers"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Test should fail after leaving email field",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													"\r",
-													"pm.test(\"Status code is 400 after leaving email field\", function () {\r",
-													"    pm.response.to.have.status(400);\r",
-													"});\r",
-													""
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\r\n    \"adminLastName\": \"Jay\",\r\n    \"adminFirstName\": \"Patel\",\r\n    \"customerName\": \"New Customer\",\r\n    \"adminEmail\": \"\",\r\n    \"customerType\": \"WAREHOUSE\"\r\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
-										"url": {
-											"raw": "{{url}}/feature/customers",
-											"host": [
-												"{{url}}"
-											],
-											"path": [
-												"feature",
-												"customers"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Test should fail after leaving first name and last name text field",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													"\r",
-													"pm.test(\"Status code is 400 after leaving First name and last name blank\", function () {\r",
-													"    pm.response.to.have.status(400);\r",
-													"});\r",
-													""
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\r\n    \"adminLastName\": \"\",\r\n    \"adminFirstName\": \"\",\r\n    \"customerName\": \"New Customer\",\r\n    \"adminEmail\": \"{{$randomEmail}}\",\r\n    \"customerType\": \"WAREHOUSE\"\r\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
-										"url": {
-											"raw": "{{url}}/feature/customers",
-											"host": [
-												"{{url}}"
-											],
-											"path": [
-												"feature",
-												"customers"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Test should fail after leaving Customer name",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													"\r",
-													"pm.test(\"Status code is 400 after leaving Customer name blank\", function () {\r",
-													"    pm.response.to.have.status(400);\r",
-													"});\r",
-													""
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\r\n    \"adminLastName\": \"james\",\r\n    \"adminFirstName\": \"d\",\r\n    \"customerName\": \"\",\r\n    \"adminEmail\": \"{{$randomEmail}}\",\r\n    \"customerType\": \"WAREHOUSE\"\r\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
-										"url": {
-											"raw": "{{url}}/feature/customers",
-											"host": [
-												"{{url}}"
-											],
-											"path": [
-												"feature",
-												"customers"
-											]
-										}
-									},
-									"response": []
-								}
-							]
-						},
-						{
 							"name": "Test_postive flow",
 							"item": [
 								{
@@ -653,13 +363,303 @@
 							]
 						},
 						{
+							"name": "Test_Negative flow",
+							"item": [
+								{
+									"name": "Test should fail with invalid email for customer",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"\r",
+													"window = {};\r",
+													"pm.sendRequest(\"https://cdnjs.cloudflare.com/ajax/libs/Faker/3.1.0/faker.min.js\", (error, response) => {\r",
+													"    if (error || response.code !== 200) {\r",
+													"        pm.expect.fail('Could not load external library');\r",
+													"    }\r",
+													"    eval(response.text());\r",
+													"    // Set faker library\r",
+													"    window.faker.locale=\"en\";\r",
+													"    emailid=pm.collectionVariables.get(\"firstname\")+\"_\"+pm.collectionVariables.get(\"lastname\")+\"yopmail.com\";\r",
+													"    pm.collectionVariables.set(\"invalidEmailCustomer\",emailid);\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code for invalid customer is 400\", function () {\r",
+													"    pm.response.to.have.status(400);\r",
+													"});\r",
+													"pm.test(\"Not a valid email address. error message appear\", function () {\r",
+													"    pm.expect(pm.response.text()).to.include(\"Not a valid email address.\");\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"adminLastName\": \"Jay\",\r\n    \"adminFirstName\": \"Patel\",\r\n    \"customerName\": \"New Customer\",\r\n    \"adminEmail\": \"{{invalidEmailCustomer}}\",\r\n    \"customerType\": \"WAREHOUSE\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/feature/customers",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"feature",
+												"customers"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Test should fail after enter special character and number in text field",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"\r",
+													"pm.test(\"Status code is 400 after enter special character and number in name text field\", function () {\r",
+													"    pm.response.to.have.status(400);\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"adminLastName\": \"432%$$^$&\",\r\n    \"adminFirstName\": \"&9695874\",\r\n    \"customerName\": \"New Customer\",\r\n    \"adminEmail\": \"{{$randomEmail}}\",\r\n    \"customerType\": \"WAREHOUSE\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/feature/customers",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"feature",
+												"customers"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Test should fail if email id is alredy is existed",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"//user already exist\r",
+													"pm.test(\"Verify Message User is already exist in account for customer\", function (){\r",
+													"    pm.response.to.have.body(\"{\\\"message\\\": \\\"User already exists\\\"}\\n\")\r",
+													"});\r",
+													"pm.test(\"Status code of existed user for customer\", function () {\r",
+													"    pm.response.to.have.status(400);\r",
+													"});\r",
+													"pm.test(\"Response time for existed email for customer\" +pm.response.responseTime+\" ms\", function () {\r",
+													"    // pm.expect(pm.response.responseTime).to.be.below(200);\r",
+													"});\r",
+													"pm.test(\"Status code for existed customer name has Bad Request\", function () {    \r",
+													"    pm.response.to.have.status(\"Bad Request\");});\r",
+													"pm.test(\"Content-Type header is present\", () => {\r",
+													"  pm.response.to.have.header(\"Content-Type\");\r",
+													"});\r",
+													"pm.test(\"Content-Type header is application/json\", () => {\r",
+													"  pm.expect(pm.response.headers.get('Content-Type')).to.eql('application/json');\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"adminLastName\": \"Jay\",\r\n    \"adminFirstName\": \"Patel\",\r\n    \"customerName\": \"New Customer\",\r\n    \"adminEmail\": \"adminnorth02@yopmail.com\",\r\n    \"customerType\": \"WAREHOUSE\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/feature/customers",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"feature",
+												"customers"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Test should fail after leaving first name and last name text field",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"\r",
+													"pm.test(\"Status code is 400 after leaving First name and last name blank\", function () {\r",
+													"    pm.response.to.have.status(400);\r",
+													"});\r",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"adminLastName\": \"\",\r\n    \"adminFirstName\": \"\",\r\n    \"customerName\": \"New Customer\",\r\n    \"adminEmail\": \"{{$randomEmail}}\",\r\n    \"customerType\": \"WAREHOUSE\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/feature/customers",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"feature",
+												"customers"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Test should fail after leaving Customer name",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"\r",
+													"pm.test(\"Status code is 400 after leaving Customer name blank\", function () {\r",
+													"    pm.response.to.have.status(400);\r",
+													"});\r",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"adminLastName\": \"james\",\r\n    \"adminFirstName\": \"d\",\r\n    \"customerName\": \"\",\r\n    \"adminEmail\": \"{{$randomEmail}}\",\r\n    \"customerType\": \"WAREHOUSE\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/feature/customers",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"feature",
+												"customers"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Test should fail after leaving email field",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"\r",
+													"pm.test(\"Status code is 400 after leaving email field\", function () {\r",
+													"    pm.response.to.have.status(400);\r",
+													"});\r",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"adminLastName\": \"Jay\",\r\n    \"adminFirstName\": \"Patel\",\r\n    \"customerName\": \"New Customer\",\r\n    \"adminEmail\": \"\",\r\n    \"customerType\": \"WAREHOUSE\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/feature/customers",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"feature",
+												"customers"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
 							"name": "Add Customer",
 							"request": {
 								"method": "POST",
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"adminLastName\": \"Jay\",\r\n    \"adminFirstName\": \"Patel\",\r\n    \"customerName\": \"New Customer\",\r\n    \"adminEmail\": \"admin@new.com\",\r\n    \"customerType\": \"WAREHOUSE\"\r\n}",
+									"raw": "{\r\n    \"adminLastName\": \"Nikunj\",\r\n    \"adminFirstName\": \"Panchal\",\r\n    \"customerName\": \"New Warehouse\",\r\n    \"adminEmail\": \"nikunj@simformsolutions.com\",\r\n    \"customerType\": \"WAREHOUSE\"\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -3162,6 +3162,40 @@
 									]
 								},
 								{
+									"name": "Create Warehouse",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "customer-id",
+												"value": "{{customer-id}}",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n   \"name\": \"Test Warehouse\",\n    \"address\": \"Ahmedabad, GJ\",\n    \"latitude\": \"23.7891231\",\n    \"longitude\": \"24.234242\",\n    \"description\": \"this is description \",\n    \"arrivalInstructions\": \"this is arrival instructions\",\n    \"arrivalInstructionsImage\": {\n        \"fileName\": \"test.png\",\n        \"contentType\": \"image/png\"\n    }\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/feature/configuration/warehouses",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"feature",
+												"configuration",
+												"warehouses"
+											]
+										}
+									},
+									"response": []
+								},
+								{
 									"name": "List Warehouses",
 									"request": {
 										"method": "GET",
@@ -4849,7 +4883,7 @@
 													"script": {
 														"exec": [
 															"var responseJson = pm.response.json();\r",
-															"pm.collectionVariables.set(\"warehouse_id\",responseJson.data[0].id);"
+															"pm.collectionVariables.set(\"warehouse_id\",responseJson.id);"
 														],
 														"type": "text/javascript"
 													}
@@ -5902,7 +5936,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"fileName\": \"hello.png\",\r\n    \"tag\": \"BILL_OF_LOADING\",\r\n    \"contentType\": \"image/png\",\r\n    \"id\": \"59dbb1f2-1206-4ffa-952c-41fa588b09f9\"\r\n}",
+									"raw": "{\r\n    \"fileName\": \"hello.png\",\r\n    \"tag\": \"BILL_OF_LOADING\",\r\n    \"contentType\": \"image/png\",\r\n    \"id\": \"780fca9b-c7f1-4502-9a75-e30aa92dc85f\"\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -6360,7 +6394,7 @@
 		"apikey": [
 			{
 				"key": "value",
-				"value": "eyJraWQiOiIxVHROR1E2Q2tiMnFUaU4wTzVrcEx6RHVsN1U1Vk9tREFzRDAxOE96cjFJPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiI4MzBjOTFmNS0yNWVlLTRlMzYtYWQ4ZC0zNTdhMTY1ZDJmYjIiLCJkZXZpY2Vfa2V5IjoiZXUtY2VudHJhbC0xXzVhZmFmZGU0LTBmNjktNGMzYy1hOTJmLTgwNjAzYzc4ZmFjZiIsImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC5ldS1jZW50cmFsLTEuYW1hem9uYXdzLmNvbVwvZXUtY2VudHJhbC0xX3Nac0h3eHlIMCIsImNsaWVudF9pZCI6IjY2YmN1OHI4dXNtaHJzcWE0MWdtY3RpdG1zIiwib3JpZ2luX2p0aSI6ImMxMmZkNDFiLWEyOTMtNDE4My04OWMxLWYzMzQyMDllMjU3MyIsImV2ZW50X2lkIjoiNzA0YmQ5YmItZWY3Yy00ODhlLTlhZjAtYjIzYzk1Y2JkNmZjIiwidG9rZW5fdXNlIjoiYWNjZXNzIiwic2NvcGUiOiJhd3MuY29nbml0by5zaWduaW4udXNlci5hZG1pbiIsImF1dGhfdGltZSI6MTY4MTg4ODAzOSwiZXhwIjoxNjgxOTc0NDM5LCJpYXQiOjE2ODE4ODgwMzksImp0aSI6IjU3ZTAzNmI0LWRhZjctNDlmMS04MjhjLWFkMjQ3YmYwZjczNCIsInVzZXJuYW1lIjoiODMwYzkxZjUtMjVlZS00ZTM2LWFkOGQtMzU3YTE2NWQyZmIyIn0.UTnloIN2tas5zEeh5UoojldN2TPl-ZxcfeTfAs57H8ibmkU4m5jtNunOZ6R2N9JjF6A7ggto_CYfAuDKx19YLABa7xxNw2jft0lP1oZK-E1XLPrgwHNev1Udlrtw0H0EjFGJ7fb7yHtg49knMf9bcR2GjcxARqxUEhYGXxK_Y8dn4k1dWH0pxrq77cpbQ33z_LhsAYu9gANa3kDoe2vtbfB3Bq-JmAPZnxtPpTTk1lSvVDcf4_aXXIjB-BNO7oNwazRTPlOANnoSFzFq_iiQmEnoCUe0fr76O0Sm2wFcCYsjBpVolu83_Tp5w-Ifsr1GeEylqZ5lYrfof-fViY19hw",
+				"value": "{{cognitoAccessToken}}",
 				"type": "string"
 			},
 			{
