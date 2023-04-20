@@ -31,7 +31,8 @@ jobs:
        newman run "NorthBound.postman_collection.json" -e "NorthBoundDev.postman_environment.json" -g "workspace.postman_globals.json" -r htmlextra --reporter-htmlextra-export SampleArtifact/report.html
     - name: publish report
       if: always()
-      uses: actions/checkout@v3
+    - name: HTML Preview
+      id: html_preview
+      uses: pavi2410/html-preview-action@v2
       with:
-    - name: Reports
-      path: SampleArtifact
+      html_file: 'index.html'
