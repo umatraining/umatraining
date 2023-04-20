@@ -33,5 +33,5 @@ jobs:
       if: always()
       uses: actions/checkout@v3
       with:
-       name: Reports
-       path: SampleArtifact
+    - name: Reports
+      path: SampleArtifact
