@@ -28,7 +28,7 @@ jobs:
        npm install -g newman-reporter-htmlextra
     - name: Run collection
       run: |
-       newman run "NorthBound.postman_collection.json" -e "NorthBoundDev.postman_environment.json" -g "workspace.postman_globals.json" -r htmlextra ---reporter-htmlextrs-export SampleArtifact/report.html
+       newman run "NorthBound.postman_collection.json" -e "NorthBoundDev.postman_environment.json" -g "workspace.postman_globals.json" -r htmlextra --reporter-htmlextra-export SampleArtifact/report.html
     - name: publish report
       uses: actions/checkout@v3
       with:
