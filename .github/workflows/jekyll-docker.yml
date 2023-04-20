@@ -33,6 +33,6 @@ jobs:
       if: always()
     - name: HTML Preview
       id: html_preview
-      uses: SampleArtifact/html-preview-action@v2
+      uses: SampleArtifact/html-preview-action@v3
       with:
         html_file: 'index.html'
