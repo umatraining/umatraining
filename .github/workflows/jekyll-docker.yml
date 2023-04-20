@@ -32,7 +32,7 @@ jobs:
     - name: publish report
       if: always()
     - name: Html Reports
-    - uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v3
       with:
         name : Reports
-        path : SampleArtifact 
+        path : SampleArtifact
