@@ -31,8 +31,6 @@ jobs:
        newman run "NorthBound.postman_collection.json" -e "NorthBoundDev.postman_environment.json" -g "workspace.postman_globals.json" -r htmlextra --reporter-htmlextra-export SampleArtifact/report.html
     - name: publish report
       if: always()
-    - name: Html Reports
-      uses: actions/upload-artifact@v3
+      uses: actions/checkout@v3
       with:
-        name : Reports
-        path : SampleArtifact 
+       name: Reports
