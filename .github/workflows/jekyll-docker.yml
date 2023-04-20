@@ -12,8 +12,8 @@ jobs:
     runs-on: ubuntu-latest
  
     steps:
-    - uses: actions/checkout@v3
     - name: Check out Git repositor
+      uses: actions/checkout@v3
     - name: Install dependencies
       run: |
        mkdir SampleArtifact
